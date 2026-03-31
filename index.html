@@ -652,6 +652,100 @@
     }
     .dash-view-all button:hover { gap:14px; }
     .dash-view-all button .mso { font-size:18px; }
+
+    /* ── ALL RESERVATIONS SCREEN ───────────────────────────── */
+    .allres-toolbar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .allres-search-wrap {
+      position: relative; flex: 1; min-width: 200px;
+    }
+    .allres-search-wrap input {
+      width: 100%; padding: 10px 12px 10px 38px;
+      background: var(--surface-container-lowest);
+      border: none; border-radius: 10px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      color: var(--on-surface); outline: none;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+    .allres-search-wrap input:focus { box-shadow: 0 0 0 2px rgba(4,60,44,0.2); }
+    .allres-search-wrap input::placeholder { color: #a0aec0; }
+    .allres-filters {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    }
+    .allres-filters select,
+    .allres-filters input[type="date"] {
+      padding: 9px 12px;
+      background: var(--surface-container-lowest);
+      border: none; border-radius: 10px;
+      font-size: 12px; font-family: 'Inter', sans-serif;
+      color: var(--on-surface); outline: none;
+      box-shadow: var(--shadow-sm); cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+    }
+    .allres-filters select {
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2350635a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+    }
+
+    .allres-table-wrap {
+      overflow-x: auto; border-radius: 16px;
+      box-shadow: var(--shadow-sm); margin-bottom: 20px;
+    }
+    .allres-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--surface-container-lowest);
+    }
+    .allres-table th {
+      background: var(--surface-container-low);
+      padding: 13px 16px; text-align: left;
+      font-family: 'Manrope', sans-serif; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--on-surface-variant); white-space: nowrap;
+    }
+    .allres-table th.sortable {
+      cursor: pointer; user-select: none;
+      transition: background 0.15s;
+    }
+    .allres-table th.sortable:hover { background: var(--surface-container-high); }
+    .allres-table th.sort-asc  .sort-icon::before { content: 'arrow_upward'; }
+    .allres-table th.sort-desc .sort-icon::before { content: 'arrow_downward'; }
+    .sort-icon { font-size: 12px !important; opacity: 0.5; vertical-align: middle; margin-left: 2px; }
+    .allres-table td {
+      padding: 13px 16px; font-size: 13px;
+      white-space: nowrap; color: var(--on-surface);
+    }
+    .allres-table tbody tr:hover td { background: var(--surface-container-low); }
+    .allres-table tbody tr + tr td { border-top: 1px solid var(--surface-container-high); }
+
+    .allres-conf { font-family:'Manrope',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.03em; color:var(--primary); }
+    .allres-guest { font-weight:600; }
+    .allres-money { font-family:'Manrope',sans-serif; font-weight:700; }
+    .allres-nights { text-align:center; font-family:'Manrope',sans-serif; font-weight:600; }
+
+    /* pagination */
+    .allres-pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 0;
+    }
+    .allres-page-info { font-size: 12px; color: var(--on-surface-variant); }
+    .allres-page-info strong { font-family:'Manrope',sans-serif; font-weight:700; color:var(--primary); }
+    .allres-page-btns { display: flex; gap: 6px; }
+    .page-btn {
+      width: 34px; height: 34px;
+      border: none; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-family:'Manrope',sans-serif; font-size:12px; font-weight:700;
+      transition: background 0.15s, color 0.15s;
+      background: var(--surface-container-lowest); color: var(--on-surface-variant);
+      box-shadow: var(--shadow-sm);
+    }
+    .page-btn:hover { background: var(--surface-container-high); }
+    .page-btn.active { background: var(--primary); color: #fff; }
+    .page-btn:disabled { opacity: 0.4; cursor: default; }
   </style>
 </head>
 <body>
@@ -848,9 +942,14 @@
         <div class="page-wrap">
           <div class="page-header">
             <div class="page-header-text"><h2>Reservations</h2><p>Latest bookings across all rooms</p></div>
-            <button class="btn-primary" onclick="showScreen('new-booking')">
-              <span class="mso">add</span>New Booking
-            </button>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+              <button class="btn-primary" onclick="showScreen('new-booking')">
+                <span class="mso">add</span>New Booking
+              </button>
+              <button class="btn-primary" style="background:var(--surface-container-high);color:var(--on-surface);box-shadow:none" onclick="showScreen('all-reservations')">
+                <span class="mso">table_rows</span>More Reservations
+              </button>
+            </div>
           </div>
           <div class="res-list-header">
             <span>Guest</span><span>Dates</span><span>Room</span><span>Status</span><span></span>
@@ -921,6 +1020,69 @@
         </div>
       </div>
 
+      <!-- Screen C: All Reservations -->
+      <div class="screen" id="screen-all-reservations">
+        <div class="page-wrap" style="max-width:1100px">
+          <div class="page-header">
+            <div class="page-header-text">
+              <h2>All Reservations</h2>
+              <p id="allres-count-label">Loading…</p>
+            </div>
+            <button class="btn-ghost" onclick="showScreen('res-summary')">
+              <span class="mso" style="font-size:16px">arrow_back</span>Back
+            </button>
+          </div>
+
+          <!-- Toolbar: search + filters + export -->
+          <div class="allres-toolbar">
+            <div class="allres-search-wrap">
+              <span class="mso" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--on-surface-variant);font-size:18px">search</span>
+              <input type="text" id="allres-search" placeholder="Search guest or confirmation…" oninput="filterAllRes()" />
+            </div>
+            <div class="allres-filters">
+              <select id="allres-status" onchange="filterAllRes()">
+                <option value="">All Statuses</option>
+                <option value="New Reservation">Confirmed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+              <input type="date" id="allres-date-from" onchange="filterAllRes()" title="Arrival from" />
+              <input type="date" id="allres-date-to"   onchange="filterAllRes()" title="Arrival to" />
+              <button class="btn-ghost" onclick="clearAllResFilters()" style="padding:8px 14px;font-size:11px">
+                <span class="mso" style="font-size:15px">filter_alt_off</span>Clear
+              </button>
+            </div>
+            <button class="btn-primary" onclick="exportToExcel()" style="white-space:nowrap">
+              <span class="mso">download</span>Export Excel
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="allres-table-wrap">
+            <table class="allres-table">
+              <thead>
+                <tr>
+                  <th onclick="sortAllRes('confirmation_number')" class="sortable">Conf. No. <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('guest_name')" class="sortable">Guest <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('arrival_date')" class="sortable">Arrival <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('departure_date')" class="sortable">Departure <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('room_name')" class="sortable">Room <span class="mso sort-icon">unfold_more</span></th>
+                  <th>Status</th>
+                  <th onclick="sortAllRes('rate')" class="sortable">ADR <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('room_night')" class="sortable">Nights <span class="mso sort-icon">unfold_more</span></th>
+                  <th onclick="sortAllRes('room_revenue')" class="sortable">Revenue <span class="mso sort-icon">unfold_more</span></th>
+                </tr>
+              </thead>
+              <tbody id="allres-tbody">
+                <tr><td colspan="9" class="empty-state">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="allres-pagination" id="allres-pagination"></div>
+        </div>
+      </div>
+
     </div><!-- /page-reservations -->
 
     <!-- CALENDAR -->
@@ -955,15 +1117,6 @@
           <div class="add-row">
             <input type="text" id="new-room" placeholder="Add new room…" onkeydown="if(event.key==='Enter') addRoom()" />
             <button class="btn-primary" onclick="addRoom()">Add</button>
-          </div>
-        </div>
-        <div class="section">
-          <div class="section-label">All Reservations</div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Conf. No.</th><th>Created</th><th>Status</th><th>Guest</th><th>Arrival</th><th>Departure</th><th>Rate</th><th>Country</th><th>Channel</th><th>Room</th><th>Nights</th><th>Revenue</th></tr></thead>
-              <tbody id="reservation-table-body"><tr><td colspan="12" class="empty-state">No reservations yet</td></tr></tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -1121,15 +1274,16 @@ function showPage(page, btn) {
 
   if (page === 'dashboard')    loadDashboard();
   if (page === 'reservations') { showScreen('res-summary'); loadResSummary(); }
-  if (page === 'settings')     { loadChannels(); loadRooms(); loadDbTable(); }
+  if (page === 'settings')     { loadChannels(); loadRooms(); }
   if (page === 'admin')        loadUserList();
 }
 
 function showScreen(screen) {
   document.querySelectorAll('#page-reservations .screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
-  if (screen === 'new-booking') loadDropdowns();
-  if (screen === 'res-summary') loadResSummary();
+  if (screen === 'new-booking')       loadDropdowns();
+  if (screen === 'res-summary')       loadResSummary();
+  if (screen === 'all-reservations')  initAllRes();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1557,33 +1711,225 @@ function clearForm() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   DB TABLE
+   ALL RESERVATIONS SCREEN
 ══════════════════════════════════════════════════════════ */
-async function loadDbTable() {
-  const { data } = await db.from('reservations').select('*').order('created_date', { ascending: false });
-  const tbody = document.getElementById('reservation-table-body');
-  if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="empty-state">No reservations yet</td></tr>'; return; }
-  tbody.innerHTML = data.map(r => `
-    <tr>
-      <td style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.02em">${r.confirmation_number}</td>
-      <td style="color:var(--on-surface-variant)">${r.created_date || '—'}</td>
-      <td><select class="status-select ${r.status === 'Cancelled' ? 'status-cancelled' : 'status-new'}" onchange="updateStatus('${r.id}', this.value, this)">
-        <option ${r.status === 'New Reservation' ? 'selected' : ''}>New Reservation</option>
-        <option ${r.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-      </select></td>
-      <td style="font-weight:500">${r.guest_name}</td>
-      <td>${r.arrival_date}</td><td>${r.departure_date}</td>
-      <td style="font-family:'Manrope',sans-serif;font-weight:600">${Number(r.rate).toLocaleString()}</td>
-      <td style="color:var(--on-surface-variant)">${r.country || '—'}</td>
-      <td>${r.channel}</td><td>${r.room_name}</td>
-      <td style="text-align:center">${r.room_night}</td>
-      <td style="font-family:'Manrope',sans-serif;font-weight:600">${Number(r.room_revenue).toLocaleString()}</td>
-    </tr>`).join('');
+let _allResData    = [];   // full dataset from Supabase
+let _allResFiltered = [];  // after search/filter
+let _allResPage    = 1;
+const ALLRES_PER_PAGE = 15;
+let _sortCol = 'arrival_date';
+let _sortDir = 'desc';
+
+async function initAllRes() {
+  document.getElementById('allres-tbody').innerHTML = '<tr><td colspan="9" class="empty-state">Loading…</td></tr>';
+  const { data } = await db.from('reservations').select('*').order('arrival_date', { ascending: false });
+  _allResData = data || [];
+  filterAllRes();
+}
+
+function filterAllRes() {
+  const q      = (document.getElementById('allres-search')?.value || '').toLowerCase();
+  const status = document.getElementById('allres-status')?.value || '';
+  const from   = document.getElementById('allres-date-from')?.value || '';
+  const to     = document.getElementById('allres-date-to')?.value || '';
+
+  _allResFiltered = _allResData.filter(r => {
+    const matchQ = !q ||
+      (r.guest_name || '').toLowerCase().includes(q) ||
+      (r.confirmation_number || '').toLowerCase().includes(q);
+    const matchStatus = !status || r.status === status;
+    const matchFrom = !from || r.arrival_date >= from;
+    const matchTo   = !to   || r.arrival_date <= to;
+    return matchQ && matchStatus && matchFrom && matchTo;
+  });
+
+  // apply sort
+  _allResFiltered.sort((a, b) => {
+    let av = a[_sortCol] ?? '';
+    let bv = b[_sortCol] ?? '';
+    if (typeof av === 'number') return _sortDir === 'asc' ? av - bv : bv - av;
+    return _sortDir === 'asc'
+      ? String(av).localeCompare(String(bv))
+      : String(bv).localeCompare(String(av));
+  });
+
+  _allResPage = 1;
+  renderAllRes();
+}
+
+function sortAllRes(col) {
+  if (_sortCol === col) _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+  else { _sortCol = col; _sortDir = 'asc'; }
+
+  // update header classes
+  document.querySelectorAll('.allres-table th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+  const idx = ['confirmation_number','guest_name','arrival_date','departure_date','room_name',null,'rate','room_night','room_revenue'].indexOf(col);
+  if (idx >= 0) {
+    const ths = document.querySelectorAll('.allres-table th');
+    ths[idx]?.classList.add(_sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  }
+  filterAllRes();
+}
+
+function renderAllRes() {
+  const total  = _allResFiltered.length;
+  const pages  = Math.max(1, Math.ceil(total / ALLRES_PER_PAGE));
+  _allResPage  = Math.min(_allResPage, pages);
+  const start  = (_allResPage - 1) * ALLRES_PER_PAGE;
+  const slice  = _allResFiltered.slice(start, start + ALLRES_PER_PAGE);
+
+  // count label
+  document.getElementById('allres-count-label').textContent =
+    `${total} reservation${total !== 1 ? 's' : ''} found`;
+
+  const tbody = document.getElementById('allres-tbody');
+  if (slice.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No reservations match your filters.</td></tr>';
+  } else {
+    tbody.innerHTML = slice.map(r => {
+      const chipClass = r.status === 'Cancelled' ? 'status-cancelled' : 'status-new';
+      const chipLabel = r.status === 'Cancelled' ? 'Cancelled' : 'Confirmed';
+      return `<tr>
+        <td><span class="allres-conf">${r.confirmation_number || '—'}</span></td>
+        <td><span class="allres-guest">${r.guest_name || '—'}</span>
+            <div style="font-size:11px;color:var(--on-surface-variant);margin-top:1px">${r.country || '—'}</div></td>
+        <td>${fmtDateLong(r.arrival_date)}</td>
+        <td>${fmtDateLong(r.departure_date)}</td>
+        <td>${r.room_name || '—'}</td>
+        <td><select class="status-select ${chipClass}" onchange="updateStatus('${r.id}', this.value, this)">
+          <option ${r.status === 'New Reservation' ? 'selected' : ''}>New Reservation</option>
+          <option ${r.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+        </select></td>
+        <td class="allres-money">IDR ${Number(r.rate || 0).toLocaleString('id-ID')}</td>
+        <td class="allres-nights">${r.room_night || 0}</td>
+        <td class="allres-money">IDR ${Number(r.room_revenue || 0).toLocaleString('id-ID')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // pagination
+  renderAllResPagination(total, pages);
+}
+
+function renderAllResPagination(total, pages) {
+  const start = (_allResPage - 1) * ALLRES_PER_PAGE + 1;
+  const end   = Math.min(_allResPage * ALLRES_PER_PAGE, total);
+  const pg    = document.getElementById('allres-pagination');
+
+  if (total === 0) { pg.innerHTML = ''; return; }
+
+  // build page number buttons (show up to 5 around current)
+  let btnHTML = '';
+  const range = 2;
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || (i >= _allResPage - range && i <= _allResPage + range)) {
+      btnHTML += `<button class="page-btn${i === _allResPage ? ' active' : ''}" onclick="goAllResPage(${i})">${i}</button>`;
+    } else if (i === _allResPage - range - 1 || i === _allResPage + range + 1) {
+      btnHTML += `<button class="page-btn" disabled>…</button>`;
+    }
+  }
+
+  pg.innerHTML = `
+    <div class="allres-page-info">Showing <strong>${start}–${end}</strong> of <strong>${total}</strong></div>
+    <div class="allres-page-btns">
+      <button class="page-btn" onclick="goAllResPage(${_allResPage - 1})" ${_allResPage === 1 ? 'disabled' : ''}>
+        <span class="mso" style="font-size:16px">chevron_left</span>
+      </button>
+      ${btnHTML}
+      <button class="page-btn" onclick="goAllResPage(${_allResPage + 1})" ${_allResPage === pages ? 'disabled' : ''}>
+        <span class="mso" style="font-size:16px">chevron_right</span>
+      </button>
+    </div>`;
+}
+
+function goAllResPage(p) {
+  _allResPage = p;
+  renderAllRes();
+  document.getElementById('screen-all-reservations')?.scrollTo?.(0, 0);
+  document.querySelector('.allres-table-wrap')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+}
+
+function clearAllResFilters() {
+  document.getElementById('allres-search').value = '';
+  document.getElementById('allres-status').value = '';
+  document.getElementById('allres-date-from').value = '';
+  document.getElementById('allres-date-to').value = '';
+  filterAllRes();
+}
+
+/* ══════════════════════════════════════════════════════════
+   EXPORT TO EXCEL (.xlsx via SheetJS CDN)
+══════════════════════════════════════════════════════════ */
+function exportToExcel() {
+  if (typeof XLSX === 'undefined') {
+    // Load SheetJS on demand
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = _doExport;
+    document.head.appendChild(s);
+    showToast('Preparing export…');
+  } else {
+    _doExport();
+  }
+}
+
+function _doExport() {
+  const rows = _allResFiltered.length > 0 ? _allResFiltered : _allResData;
+  if (rows.length === 0) { showToast('No data to export'); return; }
+
+  const headers = [
+    'Confirmation No.',
+    'Guest Name',
+    'Country',
+    'Channel',
+    'Room',
+    'Arrival Date',
+    'Departure Date',
+    'Status',
+    'ADR (IDR)',
+    'Total Nights',
+    'Total Revenue (IDR)'
+  ];
+
+  const wsData = [
+    headers,
+    ...rows.map(r => [
+      r.confirmation_number || '',
+      r.guest_name          || '',
+      r.country             || '',
+      r.channel             || '',
+      r.room_name           || '',
+      r.arrival_date        || '',
+      r.departure_date      || '',
+      r.status              || '',
+      r.rate                || 0,
+      r.room_night          || 0,
+      r.room_revenue        || 0
+    ])
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Column widths
+  ws['!cols'] = [18,22,16,16,16,14,14,18,14,12,18].map(w => ({ wch: w }));
+
+  // Style header row bold (SheetJS community doesn't support cell styles, just structure)
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Reservations');
+
+  const today = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `reservations_export_${today}.xlsx`);
+  showToast(`Exported ${rows.length} row${rows.length !== 1 ? 's' : ''} ✓`);
 }
 
 async function updateStatus(id, newStatus, selectEl) {
   await db.from('reservations').update({ status: newStatus }).eq('id', id);
   selectEl.className = `status-select ${newStatus === 'Cancelled' ? 'status-cancelled' : 'status-new'}`;
+  // also update local cache so export stays in sync
+  const rec = _allResData.find(r => r.id === id);
+  if (rec) rec.status = newStatus;
   showToast('Status updated ✓');
 }
 </script>
