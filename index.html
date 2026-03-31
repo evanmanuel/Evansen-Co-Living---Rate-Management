@@ -3,1359 +3,1022 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PMS — Evansen Co Living</title>
+  <title>Evansen Co Living — PMS</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
   <style>
+    /* ── ICONS ────────────────────────────────────────────────── */
+    .mso {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal; font-style: normal;
+      font-size: 20px; line-height: 1;
+      letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap; direction: ltr;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle; user-select: none;
+    }
+
+    /* ── TOKENS ───────────────────────────────────────────────── */
     :root {
-      --bg: #f4f5f7;
-      --surface: #ffffff;
-      --border: #e5e7eb;
-      --border-light: #f0f1f3;
-      --text-primary: #111827;
-      --text-secondary: #6b7280;
-      --text-muted: #9ca3af;
-      --accent: #111827;
-      --accent-hover: #374151;
-      --green-bg: #d1fae5;
-      --green-text: #065f46;
-      --red-bg: #fee2e2;
-      --red-text: #991b1b;
-      --sidebar-width: 64px;
-      --header-height: 64px;
+      --primary:              #002519;
+      --primary-container:    #043c2c;
+      --primary-fixed:        #baeed6;
+      --vibrant:              #10b981;
+      --on-primary:           #ffffff;
+      --on-primary-fixed:     #002116;
+      --on-primary-fixed-var: #1d4f3e;
+      --secondary:            #50635a;
+      --secondary-container:  #d0e5d9;
+      --on-secondary-container:#54675e;
+      --tertiary-fixed:       #ffdad6;
+      --on-tertiary-fixed-var:#6a3935;
+      --surface:              #f9faf6;
+      --surface-dim:          #eef0ed;
+      --surface-container:    #edeeeb;
+      --surface-container-low:#f3f4f1;
+      --surface-container-high:#e7e8e5;
+      --surface-container-highest:#e2e3e0;
+      --surface-container-lowest:#ffffff;
+      --on-surface:           #191c1b;
+      --on-surface-variant:   #404944;
+      --outline-variant:      rgba(192,201,195,0.25);
+      --shadow-sm: 0px 4px 20px rgba(13,28,47,0.04), 0px 10px 40px rgba(13,28,47,0.06);
+      --shadow-card: 0px 24px 48px rgba(0,69,50,0.08);
+      --grad-primary: linear-gradient(135deg, #002519 0%, #043c2c 100%);
+      --grad-vibrant: linear-gradient(135deg, #004532 0%, #10b981 100%);
+      --sidebar-w: 220px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ── RESET ────────────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; }
+    body { font-family:'Inter',sans-serif; background:var(--surface); color:var(--on-surface); font-size:14px; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      font-size: 14px;
+    /* ══════════════════════════════════════════════════════════
+       LOGIN PAGE
+    ══════════════════════════════════════════════════════════ */
+    #login-page {
       display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px 0;
-      gap: 4px;
-      z-index: 10;
-      flex-shrink: 0;
-    }
-
-    .sidebar-logo {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 10px;
-      display: flex;
+      min-height: 100vh;
       align-items: center;
       justify-content: center;
-      margin-bottom: 20px;
-    }
-    .sidebar-logo svg { color: #fff; }
-
-    .nav-item {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.15s;
+      padding: 24px;
+      background: #f8f9ff;
       position: relative;
-      border: none;
-      background: none;
-    }
-    .nav-item:hover {
-      background: var(--bg);
-      color: var(--text-primary);
-    }
-    .nav-item.active {
-      background: var(--accent);
-      color: #fff;
-    }
-    .nav-item .tooltip {
-      position: absolute;
-      left: calc(100% + 12px);
-      background: var(--accent);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 5px 10px;
-      border-radius: 6px;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.15s;
-      z-index: 100;
-    }
-    .nav-item .tooltip::before {
-      content: '';
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 5px solid transparent;
-      border-right-color: var(--accent);
-    }
-    .nav-item:hover .tooltip { opacity: 1; }
-
-    .sidebar-spacer { flex: 1; }
-
-    /* ── MAIN LAYOUT ── */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
     }
+    #login-page.hidden { display: none; }
 
-    /* ── TOPBAR ── */
-    .topbar {
-      height: var(--header-height);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 28px;
-      gap: 16px;
-      flex-shrink: 0;
-    }
-    .topbar-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      flex: 1;
-    }
-    .topbar-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 1px;
+    /* slanted accent bg */
+    .login-bg-accent {
+      position: fixed; top:0; right:0;
+      width: 33%; height: 100%;
+      z-index: 0; pointer-events: none;
+      opacity: 0.08;
+      background: var(--vibrant);
+      clip-path: polygon(100% 0, 100% 100%, 20% 100%, 80% 0);
     }
 
-    /* ── PAGE CONTENT ── */
-    .content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px;
+    .login-wrap {
+      width: 100%; max-width: 440px;
+      position: relative; z-index: 1;
     }
 
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* ── SEARCH & FILTERS BAR ── */
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .search-box {
-      position: relative;
-      flex: 1;
-      max-width: 320px;
-    }
-    .search-box svg {
-      position: absolute;
-      left: 11px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-    .search-box input {
-      width: 100%;
-      padding: 9px 12px 9px 34px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      background: var(--surface);
-      color: var(--text-primary);
-      outline: none;
-      transition: border 0.15s;
-    }
-    .search-box input:focus { border-color: var(--accent); }
-    .search-box input::placeholder { color: var(--text-muted); }
-
-    .filter-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .filter-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-    .filter-btn svg { flex-shrink: 0; }
-
-    .toolbar-spacer { flex: 1; }
-
-    .btn-primary {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-    .btn-primary:hover { background: var(--accent-hover); }
-
-    /* ── TABLE ── */
-    .table-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .table-wrapper { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    thead tr {
-      background: #f9fafb;
-      border-bottom: 1px solid var(--border);
-    }
-    th {
-      padding: 11px 16px;
-      text-align: left;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      white-space: nowrap;
-      user-select: none;
-    }
-    th.sortable { cursor: pointer; }
-    th.sortable:hover { color: var(--text-primary); }
-
-    td {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border-light);
-      font-size: 13px;
-      white-space: nowrap;
-      color: var(--text-primary);
-    }
-    td.mono {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-    tr:hover td { background: #fafbfc; }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .status-pill::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-    .status-new {
-      background: var(--green-bg);
-      color: var(--green-text);
-    }
-    .status-new::before { background: #10b981; }
-    .status-cancelled {
-      background: var(--red-bg);
-      color: var(--red-text);
-    }
-    .status-cancelled::before { background: #ef4444; }
-
-    .status-select {
-      appearance: none;
-      border: none;
-      outline: none;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-    }
-
-    .table-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 12.5px;
-      color: var(--text-secondary);
-    }
-    .pagination {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .page-btn {
-      width: 30px;
-      height: 30px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--surface);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-secondary);
-      transition: all 0.15s;
-    }
-    .page-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-    .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .page-btn:disabled { opacity: 0.4; cursor: default; }
-
-    /* ── SETTINGS PAGE ── */
-    /* ── SETTINGS ACCORDION ── */
-    .settings-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 560px;
-    }
-
-    .acc-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: box-shadow 0.2s;
-    }
-    .acc-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-    .acc-card.open { box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
-
-    /* Summary row — always visible */
-    .acc-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.15s;
-    }
-    .acc-summary:hover { background: #fafbfc; }
-    .acc-card.open .acc-summary { background: #fafbfc; border-bottom: 1px solid var(--border-light); }
-
-    .acc-summary-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .acc-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      flex-shrink: 0;
-    }
-    .acc-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .acc-badge {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 2px 9px;
-      border-radius: 20px;
-    }
-
-    .acc-summary-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .acc-chevron {
-      color: var(--text-muted);
-      transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-      flex-shrink: 0;
-    }
-    .acc-card.open .acc-chevron { transform: rotate(180deg); }
-
-    /* Add button in collapsed state */
-    .acc-add-quick {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 12px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--surface);
-      font-size: 12px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .acc-add-quick:hover { border-color: var(--accent); color: var(--text-primary); background: #f9fafb; }
-    .acc-card.open .acc-add-quick { display: none; }
-
-    /* Expandable body */
-    .acc-body {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.28s cubic-bezier(.4,0,.2,1);
-    }
-    .acc-card.open .acc-body { grid-template-rows: 1fr; }
-    .acc-body-inner { overflow: hidden; }
-
-    /* Item list */
-    .acc-list { padding: 4px 0; }
-    .settings-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 20px;
-      transition: background 0.1s;
-    }
-    .settings-item:hover { background: #fafbfc; }
-    .settings-item span {
-      font-size: 13.5px;
-      color: var(--text-primary);
-    }
-    .remove-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-    .remove-btn:hover { background: var(--red-bg); color: var(--red-text); }
-
-    /* Add-new row inside expanded */
-    .acc-add-row {
-      display: flex;
-      gap: 8px;
-      padding: 12px 20px;
-      border-top: 1px solid var(--border-light);
-      background: #fafbfc;
-    }
-    .acc-add-row input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      transition: border 0.15s;
-      color: var(--text-primary);
-      background: var(--surface);
-    }
-    .acc-add-row input:focus { border-color: var(--accent); }
-    .acc-add-row input::placeholder { color: var(--text-muted); }
-
-    .btn-sm {
-      padding: 8px 14px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-    .btn-sm:hover { background: var(--accent-hover); }
-    .empty-state {
-      text-align: center;
-      padding: 28px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* ── RESERVATION PAGE ── */
-    .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      max-width: 700px;
-    }
-    .form-section-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 16px;
-      margin-top: 24px;
-    }
-    .form-section-title:first-child { margin-top: 0; }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-    .form-group input,
-    .form-group select {
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 13.5px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      transition: border 0.15s;
-      background: var(--surface);
-      color: var(--text-primary);
-    }
-    .form-group input:focus,
-    .form-group select:focus { border-color: var(--accent); }
-    .form-group input::placeholder { color: var(--text-muted); }
-
-    /* IDR currency input */
-    .input-prefix-wrap {
-      display: flex;
-      align-items: stretch;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      transition: border 0.15s;
-      background: var(--surface);
-    }
-    .input-prefix-wrap:focus-within { border-color: var(--accent); }
-    .input-prefix {
-      padding: 9px 11px;
-      background: #f9fafb;
-      border-right: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-    }
-    .input-prefix-wrap input {
-      border: none !important;
-      border-radius: 0 !important;
-      flex: 1;
-      outline: none !important;
-    }
-    .input-prefix-wrap input:focus { border: none; }
-
-    /* Country combobox */
-    .country-wrap { position: relative; }
-    .country-wrap select,
-    .country-wrap input.country-custom {
-      width: 100%;
-    }
-    .country-custom-row {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-      align-items: center;
-    }
-    .country-custom-row input {
-      flex: 1;
-    }
-    .country-hint {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-top: 5px;
-    }
-    .country-hint span {
-      color: var(--accent);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .form-divider {
-      border: none;
-      border-top: 1px solid var(--border-light);
-      margin: 20px 0 0;
-    }
-    .form-actions {
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Confirmation chip — appears next to Save button */
-    .conf-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #166534;
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .conf-chip.visible {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-    }
-    .conf-chip-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #16a34a;
-      opacity: 0.75;
-    }
-    .conf-chip-number {
-      font-family: 'DM Mono', monospace;
-      font-size: 13.5px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      color: #14532d;
-    }
-    .conf-chip-divider {
-      width: 1px;
-      height: 14px;
-      background: #86efac;
-    }
-    .btn-outline {
-      padding: 9px 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-outline:hover { border-color: var(--accent); color: var(--text-primary); }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--accent);
-      color: #fff;
-      padding: 11px 18px;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: all 0.25s;
-      z-index: 999;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-    .toast.show { opacity: 1; transform: translateY(0); }
-
-    /* ── AVAILABILITY PAGE ── */
-    .avail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .avail-nav {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .avail-month-display {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      min-width: 200px;
-    }
-    .avail-month-name {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: -0.3px;
-    }
-    .avail-month-year {
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--text-muted);
-    }
-    .avail-nav-btn {
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--surface);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-secondary);
-      transition: all 0.15s;
-    }
-    .avail-nav-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-
-    .avail-today-btn {
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--surface);
-      font-size: 12.5px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .avail-today-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-
-    /* Legend */
-    .avail-legend {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-    .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-
-    /* Calendar card */
-    .avail-calendar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-
-    /* Day-of-week header */
-    .cal-dow-row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      border-bottom: 1px solid var(--border);
-    }
-    .cal-dow {
-      padding: 13px 16px;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      border-right: 1px solid var(--border-light);
-    }
-    .cal-dow:last-child { border-right: none; }
-
-    /* Week rows */
-    .cal-weeks { position: relative; }
-    .cal-week {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      border-bottom: 1px solid var(--border-light);
-      min-height: 110px;
-      position: relative;
-    }
-    .cal-week:last-child { border-bottom: none; }
-
-    .cal-cell {
-      border-right: 1px solid var(--border-light);
-      padding: 10px 12px 8px;
-      position: relative;
-      min-height: 110px;
-      vertical-align: top;
-    }
-    .cal-cell:last-child { border-right: none; }
-    .cal-cell.other-month { background: #fafafa; }
-    .cal-cell.today { background: #f0f7ff; }
-
-    /* Day number — large, top-right aligned like reference */
-    .cal-day-num {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      display: block;
-      text-align: right;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .cal-cell.other-month .cal-day-num { color: #d1d5db; }
-    .cal-cell.today .cal-day-num {
-      color: #fff;
-      background: #3b82f6;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      float: right;
-    }
-
-    /* Bar layer */
-    .cal-bars-layer {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-    }
-
-    /* Bars — full-height, bleed to cell edges like reference */
-    .cal-bar {
-      position: absolute;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-      pointer-events: auto;
-      transition: filter 0.15s, box-shadow 0.15s;
-      z-index: 2;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    }
-    .cal-bar:hover {
-      filter: brightness(0.93);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 3;
-    }
-    /* Bar start/end rounding — only round ends where the reservation starts/ends */
-    .cal-bar.bar-start { border-radius: 6px 0 0 6px; }
-    .cal-bar.bar-end   { border-radius: 0 6px 6px 0; }
-    .cal-bar.bar-both  { border-radius: 6px; }
-    .cal-bar.bar-mid   { border-radius: 0; }
-
-    /* Popup */
-    .avail-popup {
-      position: fixed;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0;
-      width: 260px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.14);
-      z-index: 300;
-      opacity: 0;
-      transform: scale(0.94) translateY(-6px);
-      transition: all 0.2s cubic-bezier(.4,0,.2,1);
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .avail-popup.show {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      pointer-events: auto;
-    }
-    .popup-banner {
-      padding: 14px 16px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .popup-banner-left { display: flex; align-items: center; gap: 8px; }
-    .popup-room-dot {
-      width: 10px; height: 10px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-    .popup-room-name {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .popup-close {
-      width: 24px; height: 24px;
-      border: none; background: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 15px;
+    /* brand */
+    .login-brand {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 36px;
+    }
+    .login-logo {
+      width: 64px; height: 64px;
+      background: var(--primary);
+      border-radius: 18px;
       display: flex; align-items: center; justify-content: center;
-      border-radius: 5px;
-      transition: all 0.15s;
+      margin-bottom: 20px;
+      box-shadow: 0 0 28px rgba(16,185,129,0.18), 0 8px 24px rgba(0,37,25,0.3);
+      transition: transform 0.3s;
     }
-    .popup-close:hover { background: var(--bg); color: var(--text-primary); }
-    .popup-body {
-      padding: 0 16px 14px;
-      border-top: 1px solid var(--border-light);
-      padding-top: 12px;
+    .login-logo:hover { transform: scale(1.05); }
+    .login-logo .mso { color: var(--primary-fixed); font-size: 30px;
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .login-brand h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 30px; font-weight: 800;
+      color: var(--primary); letter-spacing: -0.03em;
     }
-    .popup-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 5px 0;
-      font-size: 12.5px;
-      gap: 8px;
-    }
-    .popup-label { color: var(--text-muted); flex-shrink: 0; }
-    .popup-value { color: var(--text-primary); font-weight: 500; text-align: right; }
-    .popup-conf {
-      font-family: 'DM Mono', monospace;
-      font-size: 11.5px;
-      color: var(--text-secondary);
-    }
-    .popup-date-range {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    /* Room-not-available warning on Reservation page */
-    .avail-warning {
-      display: none;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 12px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      font-size: 12.5px;
-      color: #dc2626;
-      font-weight: 500;
+    .login-brand p {
       margin-top: 6px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--vibrant);
     }
-    .avail-warning.show { display: flex; }
-    .form-group select.error { border-color: #f87171; background: #fff8f8; }
 
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    /* card */
+    .login-card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 40px 40px 36px;
+      box-shadow: var(--shadow-card);
+      position: relative; overflow: hidden;
+    }
+    .login-card-accent {
+      position: absolute; top:0; left:0;
+      width: 5px; height: 100%;
+      background: rgba(16,185,129,0.2);
+    }
+    .login-card header {
+      text-align: center; margin-bottom: 36px;
+    }
+    .login-card header h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 26px; font-weight: 700;
+      color: var(--on-surface); margin-bottom: 8px;
+    }
+    .login-card header p { font-size: 13px; color: var(--secondary); }
+
+    /* error banner */
+    .login-error {
+      display: none;
+      background: rgba(186,26,26,0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #9b1c1c;
+      font-weight: 500;
+      align-items: center; gap: 8px;
+    }
+    .login-error.show { display: flex; }
+
+    /* fields */
+    .login-field { margin-bottom: 22px; }
+    .login-field-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 8px; padding: 0 2px;
+    }
+    .login-field label {
+      font-family: 'Manrope', sans-serif;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--secondary);
+    }
+    .login-field-wrap { position: relative; }
+    .login-field input {
+      width: 100%;
+      background: var(--surface-container-low);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 14px 48px 14px 18px;
+      font-size: 14px; font-family: 'Inter', sans-serif;
+      color: var(--on-surface); outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .login-field input:focus {
+      border-color: rgba(16,185,129,0.3);
+      background: #fff;
+    }
+    .login-field-icon {
+      position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(16,185,129,0.4);
+      pointer-events: none;
+    }
+
+    /* submit */
+    .login-submit {
+      width: 100%; margin-top: 28px;
+      padding: 15px;
+      background: var(--grad-vibrant);
+      color: #fff; border: none; border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(16,185,129,0.25);
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .login-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(16,185,129,0.35); }
+    .login-submit:active { transform: translateY(0); }
+    .login-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+    .login-submit .mso { font-size: 18px; transition: transform 0.2s; }
+    .login-submit:hover .mso { transform: translateX(3px); }
+
+    .login-footer {
+      margin-top: 32px; padding-top: 24px;
+      border-top: 1px solid var(--surface-container-low);
+      text-align: center;
+      font-size: 13px; color: var(--secondary);
+    }
+
+    .login-tagline {
+      margin-top: 40px; text-align: center;
+      font-family: 'Manrope', sans-serif;
+      font-size: 9px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.3em;
+      color: var(--primary); opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       APP (shown after login)
+    ══════════════════════════════════════════════════════════ */
+    #app { display: none; }
+    #app.active { display: flex; }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; top:0; left:0;
+      width: var(--sidebar-w); height:100vh;
+      background: var(--surface-dim);
+      display: flex; flex-direction: column;
+      padding: 28px 16px 24px; z-index:100;
+    }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:0 8px; margin-bottom:36px; }
+    .sidebar-brand-icon {
+      width:36px; height:36px; background:var(--grad-primary);
+      border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .sidebar-brand-icon .mso { color:var(--primary-fixed); font-size:18px;
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .sidebar-brand-text h1 { font-family:'Manrope',sans-serif; font-size:14px; font-weight:800; color:#043c2c; line-height:1; }
+    .sidebar-brand-text p { font-family:'Manrope',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--secondary); margin-top:3px; }
+    .sidebar-nav { flex:1; display:flex; flex-direction:column; gap:2px; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:8px;
+      cursor:pointer; border:none; background:none;
+      width:100%; text-align:left; text-decoration:none;
+      transition:background 0.15s, color 0.15s; color:var(--secondary);
+    }
+    .nav-item .mso { font-size:18px; flex-shrink:0; }
+    .nav-item .label { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; }
+    .nav-item:hover { background:var(--surface-container-high); color:var(--primary); }
+    .nav-item.active { background:rgba(186,238,214,0.45); color:var(--primary); }
+    .nav-item.hidden-nav { display:none; }
+    .sidebar-footer { border-top:1px solid rgba(0,0,0,0.06); padding-top:16px; }
+
+    /* user pill in sidebar footer */
+    .sidebar-user {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 12px; margin-bottom:4px;
+    }
+    .sidebar-user-avatar {
+      width:28px; height:28px; border-radius:50%;
+      background:var(--grad-primary);
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .sidebar-user-avatar .mso { font-size:14px; color:var(--primary-fixed); }
+    .sidebar-user-info { flex:1; min-width:0; }
+    .sidebar-user-name { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; color:var(--on-surface); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sidebar-user-role { font-size:9px; color:var(--secondary); text-transform:uppercase; letter-spacing:0.06em; }
+
+    /* TOPBAR */
+    .topbar {
+      position:fixed; top:0; left:var(--sidebar-w); right:0;
+      height:60px;
+      background:rgba(249,250,246,0.85);
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 40px; z-index:90;
+    }
+    .topbar-title { font-family:'Manrope',sans-serif; font-size:15px; font-weight:800; color:var(--on-surface); letter-spacing:-0.01em; }
+
+    /* MAIN */
+    .main { margin-left:var(--sidebar-w); padding-top:60px; flex:1; min-height:100vh; width:100%; }
+    .page { display:none; }
+    .page.active { display:block; }
+    .screen { display:none; }
+    .screen.active { display:block; }
+    .page-wrap { padding:48px 40px; max-width:1000px; }
+
+    /* PAGE HEADER */
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:40px; }
+    .page-header-text h2 { font-family:'Manrope',sans-serif; font-size:28px; font-weight:800; color:var(--primary); letter-spacing:-0.03em; line-height:1.1; }
+    .page-header-text p { margin-top:6px; font-size:13px; color:var(--secondary); }
+
+    /* BUTTONS */
+    .btn-primary {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:11px 22px; background:var(--grad-primary); color:var(--on-primary);
+      border:none; border-radius:8px; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:12px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.06em;
+      transition:opacity 0.2s, transform 0.15s;
+      box-shadow:0 4px 16px rgba(0,37,25,0.25);
+    }
+    .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
+    .btn-primary .mso { font-size:16px; }
+    .btn-ghost {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:11px 20px; background:var(--surface-container-high); color:var(--on-surface);
+      border:none; border-radius:8px; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:12px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.06em; transition:background 0.15s;
+    }
+    .btn-ghost:hover { background:var(--surface-container-highest); }
+    .btn-danger {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 16px; background:#fee2e2; color:#9b1c1c;
+      border:none; border-radius:8px; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.05em; transition:background 0.15s;
+    }
+    .btn-danger:hover { background:#fecaca; }
+    .btn-text {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:11px 8px; background:none; color:var(--secondary);
+      border:none; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:12px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.06em; transition:color 0.15s;
+    }
+    .btn-text:hover { color:var(--primary); }
+
+    /* RESERVATION CARDS */
+    .res-list { display:flex; flex-direction:column; gap:10px; }
+    .res-list-header { display:grid; grid-template-columns:1fr 200px 160px 140px 40px; gap:16px; padding:0 24px 10px; }
+    .res-list-header span { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--on-surface-variant); }
+    .res-list-header span:nth-child(2),.res-list-header span:nth-child(3),.res-list-header span:nth-child(4) { text-align:center; }
+    .res-card { background:var(--surface-container-lowest); border-radius:12px; padding:20px 24px; display:grid; grid-template-columns:1fr 200px 160px 140px 40px; align-items:center; gap:16px; box-shadow:var(--shadow-sm); transition:background 0.2s; }
+    .res-card:hover { background:var(--surface-container-low); }
+    .res-guest-name { font-family:'Manrope',sans-serif; font-size:15px; font-weight:700; color:var(--on-surface); }
+    .res-guest-meta { font-size:12px; color:var(--on-surface-variant); margin-top:2px; }
+    .res-dates { text-align:center; }
+    .res-dates-range { font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; color:var(--primary); }
+    .res-dates-nights { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--on-surface-variant); opacity:0.7; margin-top:2px; }
+    .res-room { display:inline-flex; align-items:center; justify-content:center; padding:5px 14px; background:var(--surface-container); border-radius:20px; font-size:12px; font-weight:500; color:var(--on-surface); white-space:nowrap; }
+    .chip { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .chip-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .chip-confirmed,.chip-new { background:var(--primary-fixed); color:var(--on-primary-fixed-var); }
+    .chip-confirmed .chip-dot,.chip-new .chip-dot { background:var(--primary-container); }
+    .chip-cancelled { background:#fde8e8; color:#9b1c1c; }
+    .chip-cancelled .chip-dot { background:#9b1c1c; }
+    .chip-pending { background:var(--tertiary-fixed); color:var(--on-tertiary-fixed-var); }
+    .chip-pending .chip-dot { background:#7a4f3a; }
+    .icon-btn { width:32px; height:32px; border:none; background:none; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--on-surface-variant); transition:background 0.15s; }
+    .icon-btn:hover { background:var(--surface-container-highest); }
+
+    /* STAT CARDS */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:40px; }
+    .stat-card { border-radius:12px; padding:28px; display:flex; flex-direction:column; justify-content:space-between; min-height:120px; }
+    .stat-card-dark { background:var(--grad-primary); color:rgba(186,238,214,0.85); }
+    .stat-card-light { background:var(--surface-container-lowest); box-shadow:var(--shadow-sm); color:var(--on-surface-variant); }
+    .stat-label { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; opacity:0.75; margin-bottom:6px; }
+    .stat-value { font-family:'Manrope',sans-serif; font-size:36px; font-weight:800; line-height:1; letter-spacing:-0.04em; }
+    .stat-card-dark .stat-value { color:var(--primary-fixed); }
+    .stat-card-light .stat-value { color:var(--primary); }
+    .stat-footer { font-size:11px; font-weight:500; display:flex; align-items:center; gap:4px; margin-top:12px; }
+
+    /* FORM */
+    .form-card { background:var(--surface-container-lowest); border-radius:16px; padding:40px 40px 32px; box-shadow:var(--shadow-sm); }
+    .form-section { margin-bottom:44px; }
+    .form-section-header { display:flex; align-items:center; gap:10px; margin-bottom:28px; }
+    .form-section-header .mso { color:var(--primary-container); font-size:20px; }
+    .form-section-header h3 { font-family:'Manrope',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--primary); }
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:28px 40px; }
+    .form-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:28px 24px; }
+    .form-group { display:flex; flex-direction:column; gap:8px; }
+    .form-group label { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--secondary); padding-left:2px; }
+    .form-group input,.form-group select,.form-group textarea { background:var(--surface-container-low); border:none; border-bottom:1px solid var(--outline-variant); padding:12px 4px; font-size:14px; font-family:'Inter',sans-serif; color:var(--on-surface); outline:none; transition:border-color 0.2s; -webkit-appearance:none; appearance:none; border-radius:0; width:100%; }
+    .form-group textarea { resize:vertical; min-height:72px; padding:10px 4px; }
+    .form-group input::placeholder,.form-group textarea::placeholder { color:#a0aec0; }
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus { border-bottom-color:var(--primary-container); }
+    .form-group select { cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2350635a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 6px center; padding-right:28px; }
+    .rate-wrap { position:relative; }
+    .rate-prefix { position:absolute; left:4px; top:50%; transform:translateY(-50%); font-size:12px; font-weight:600; color:var(--on-surface-variant); pointer-events:none; }
+    .rate-wrap input { padding-left:38px; }
+    .avail-notice { background:rgba(208,229,217,0.3); border-radius:8px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px; }
+    .avail-notice .mso { font-size:18px; color:var(--primary-container); flex-shrink:0; }
+    .avail-notice p { font-size:12px; color:var(--on-secondary-container); font-weight:500; line-height:1.5; }
+    .avail-notice.error { background:rgba(253,232,232,0.7); }
+    .avail-notice.error .mso { color:#9b1c1c; }
+    .avail-notice.error p { color:#9b1c1c; }
+    .avail-notice.success { background:rgba(186,238,214,0.4); }
+    .avail-notice.success .mso { color:var(--primary); }
+    .avail-notice.success p { color:var(--primary); }
+    .form-actions { display:flex; align-items:center; justify-content:space-between; padding-top:28px; border-top:1px solid var(--surface-container-high); margin-top:12px; }
+    .form-actions-right { display:flex; gap:10px; align-items:center; }
+    .save-chip { display:none; align-items:center; gap:6px; padding:7px 14px; background:var(--primary-fixed); border-radius:20px; font-family:'Manrope',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--on-primary-fixed-var); }
+    .save-chip.show { display:inline-flex; }
+    .save-chip .mso { font-size:14px; }
+
+    /* SETTINGS */
+    .section { background:var(--surface-container-lowest); border-radius:16px; padding:28px 32px; margin-bottom:20px; box-shadow:var(--shadow-sm); }
+    .section-label { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--on-surface-variant); margin-bottom:20px; }
+    .list-item { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-radius:8px; margin-bottom:4px; transition:background 0.15s; }
+    .list-item:hover { background:var(--surface-container-low); }
+    .list-item span { font-size:14px; color:var(--on-surface); font-weight:500; }
+    .remove-btn { width:28px; height:28px; background:none; border:none; cursor:pointer; color:var(--on-surface-variant); font-size:14px; border-radius:6px; display:flex; align-items:center; justify-content:center; transition:background 0.15s,color 0.15s; opacity:0; }
+    .list-item:hover .remove-btn { opacity:1; }
+    .remove-btn:hover { background:#fee2e2; color:#dc2626; }
+    .add-row { display:flex; gap:8px; margin-top:16px; padding:0 12px; }
+    .add-row input { flex:1; padding:9px 4px; border:none; border-bottom:1px solid var(--outline-variant); background:transparent; font-size:14px; font-family:'Inter',sans-serif; color:var(--on-surface); outline:none; transition:border-color 0.2s; }
+    .add-row input:focus { border-bottom-color:var(--primary); }
+
+    /* DATABASE TABLE */
+    .table-wrap { overflow-x:auto; border-radius:16px; box-shadow:var(--shadow-sm); }
+    table { width:100%; border-collapse:collapse; background:var(--surface-container-lowest); }
+    th { background:var(--surface-container-low); padding:13px 16px; text-align:left; font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--on-surface-variant); white-space:nowrap; }
+    td { padding:13px 16px; font-size:13px; white-space:nowrap; color:var(--on-surface); }
+    tbody tr:hover td { background:var(--surface-container-low); }
+    .status-select { padding:4px 10px; border:none; border-radius:20px; font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; cursor:pointer; outline:none; -webkit-appearance:none; appearance:none; letter-spacing:0.03em; }
+    .status-new { background:var(--primary-fixed); color:var(--on-primary-fixed-var); }
+    .status-cancelled { background:#fde8e8; color:#9b1c1c; }
+
+    /* ── ADMIN PAGE ─────────────────────────────────────────── */
+    .user-card {
+      background: var(--surface-container-lowest);
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: grid;
+      grid-template-columns: 40px 1fr auto auto;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    .user-card:hover { background: var(--surface-container-low); }
+    .user-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .user-avatar .mso { color: var(--primary-fixed); font-size: 18px; }
+    .user-avatar.master { background: var(--grad-vibrant); }
+    .user-name { font-family:'Manrope',sans-serif; font-size:14px; font-weight:700; color:var(--on-surface); }
+    .user-email { font-size:12px; color:var(--on-surface-variant); margin-top:2px; }
+    .user-role-chip {
+      padding: 4px 12px; border-radius: 20px;
+      font-family:'Manrope',sans-serif; font-size:10px; font-weight:700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .role-master { background: rgba(16,185,129,0.15); color: #047857; }
+    .role-user   { background: var(--surface-container-high); color: var(--on-surface-variant); }
+
+    /* invite form */
+    .invite-card {
+      background: var(--surface-container-lowest);
+      border-radius: 16px; padding: 28px 32px;
+      box-shadow: var(--shadow-sm); margin-bottom: 24px;
+    }
+    .invite-row {
+      display: grid; grid-template-columns: 1fr 1fr auto;
+      gap: 16px; align-items: end; margin-top: 20px;
+    }
+    .invite-field { display: flex; flex-direction: column; gap: 6px; }
+    .invite-field label { font-family:'Manrope',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--secondary); }
+    .invite-field input {
+      background: var(--surface-container-low);
+      border: none; border-bottom: 1px solid var(--outline-variant);
+      padding: 10px 4px; font-size: 14px;
+      font-family: 'Inter', sans-serif; color: var(--on-surface);
+      outline: none; transition: border-color 0.2s; width: 100%;
+    }
+    .invite-field input:focus { border-bottom-color: var(--primary-container); }
+    .invite-field input::placeholder { color: #a0aec0; }
+
+    /* modal overlay */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,28,47,0.35);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      z-index: 500; align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 20px; padding: 36px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(13,28,47,0.15);
+    }
+    .modal h3 { font-family:'Manrope',sans-serif; font-size:18px; font-weight:800; color:var(--on-surface); margin-bottom:8px; }
+    .modal p { font-size:13px; color:var(--secondary); line-height:1.6; }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:28px; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:28px; right:28px; background:var(--on-surface); color:#fff; padding:12px 20px; border-radius:10px; font-size:13px; font-family:'Inter',sans-serif; opacity:0; transform:translateY(8px); transition:opacity 0.25s,transform 0.25s; z-index:999; box-shadow:0 8px 24px rgba(13,28,47,0.18); }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .empty-state { text-align:center; padding:48px; color:var(--on-surface-variant); font-size:13px; }
+
+    /* ── DASHBOARD ─────────────────────────────────────────── */
+    .dash-wrap { padding:40px 40px 60px; max-width:1040px; }
+
+    /* greeting row */
+    .dash-greeting {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:40px; gap:20px; flex-wrap:wrap;
+    }
+    .dash-greeting h2 {
+      font-family:'Manrope',sans-serif;
+      font-size:32px; font-weight:800;
+      color:var(--primary); letter-spacing:-0.035em; line-height:1.1;
+    }
+    .dash-greeting p { margin-top:6px; font-size:13px; color:var(--on-surface-variant); }
+    .dash-new-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:14px 24px;
+      background:var(--grad-primary); color:var(--on-primary);
+      border:none; border-radius:12px; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:12px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.07em;
+      box-shadow:0 4px 20px rgba(0,37,25,0.28);
+      transition:opacity 0.2s, transform 0.15s; white-space:nowrap;
+      flex-shrink:0;
+    }
+    .dash-new-btn:hover { opacity:0.87; transform:translateY(-1px); }
+    .dash-new-btn .mso { font-size:18px; }
+
+    /* bento kpi grid */
+    .dash-kpi {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px; margin-bottom:40px;
+    }
+    .kpi-card {
+      border-radius:20px; padding:28px 28px 24px;
+      position:relative; overflow:hidden;
+    }
+    .kpi-card-light { background:var(--surface-container-lowest); box-shadow:var(--shadow-sm); }
+    .kpi-card-dark  { background:var(--grad-primary); }
+    .kpi-bg-orb {
+      position:absolute; top:0; right:0;
+      width:100px; height:100px; border-radius:0 0 0 100%;
+      transition:transform 0.4s;
+    }
+    .kpi-card:hover .kpi-bg-orb { transform:scale(1.15); }
+    .kpi-card-light .kpi-bg-orb { background:rgba(0,37,25,0.05); }
+    .kpi-card-dark  .kpi-bg-orb { background:rgba(255,255,255,0.05); }
+    .kpi-label {
+      font-family:'Manrope',sans-serif; font-size:10px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px;
+      display:block; position:relative;
+    }
+    .kpi-card-light .kpi-label { color:var(--primary); opacity:0.6; }
+    .kpi-card-dark  .kpi-label { color:var(--primary-fixed); opacity:0.75; }
+    .kpi-value-row { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; position:relative; }
+    .kpi-value {
+      font-family:'Manrope',sans-serif; font-weight:800; line-height:1; letter-spacing:-0.04em;
+    }
+    .kpi-card-light .kpi-value { font-size:48px; color:var(--primary); }
+    .kpi-card-dark  .kpi-value { font-size:14px; color:rgba(186,238,214,0.8); }
+    .kpi-card-dark  .kpi-value-large { font-size:36px; color:#fff; display:block; margin-top:4px; letter-spacing:-0.03em; font-family:'Manrope',sans-serif; font-weight:800; }
+    .kpi-badge {
+      font-size:11px; font-weight:700; color:#059669;
+      background:rgba(5,150,105,0.12); border-radius:6px; padding:2px 7px;
+    }
+    .kpi-sub {
+      font-size:12px; font-style:italic; position:relative;
+    }
+    .kpi-card-light .kpi-sub { color:var(--on-surface-variant); }
+    .kpi-card-dark  .kpi-sub { display:flex; align-items:center; gap:6px; color:var(--primary-fixed); opacity:0.8; background:rgba(255,255,255,0.08); width:max-content; padding:4px 10px; border-radius:6px; font-style:normal; font-weight:600; }
+    .kpi-card-dark  .kpi-sub .mso { font-size:14px; }
+
+    /* upcoming arrivals */
+    .dash-section-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding-bottom:16px;
+      border-bottom:1px solid var(--surface-container-high);
+      margin-bottom:20px;
+    }
+    .dash-section-header h3 {
+      font-family:'Manrope',sans-serif; font-size:20px; font-weight:800;
+      color:var(--primary); letter-spacing:-0.02em;
+    }
+    .dash-section-meta { display:flex; align-items:center; gap:6px; }
+    .dash-section-meta span { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--on-surface-variant); }
+    .dash-section-meta strong { font-family:'Manrope',sans-serif; font-size:12px; font-weight:800; color:var(--primary); }
+
+    .arrival-list { display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
+    .arrival-row {
+      display:flex; align-items:center; gap:20px;
+      background:var(--surface-container-low);
+      border-radius:14px; padding:18px 24px;
+      position:relative; transition:background 0.2s;
+      cursor:default;
+    }
+    .arrival-row:hover { background:var(--surface-container-high); }
+
+    .arrival-conf {
+      flex-shrink:0; width:100px;
+    }
+    .arrival-conf .lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--on-surface-variant); }
+    .arrival-conf .val { font-family:'Manrope',sans-serif; font-size:13px; font-weight:700; color:var(--primary); margin-top:2px; }
+
+    .arrival-guest { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+    .arrival-avatar {
+      width:44px; height:44px; border-radius:50%; flex-shrink:0;
+      background:var(--grad-primary);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Manrope',sans-serif; font-size:14px; font-weight:800;
+      color:var(--primary-fixed);
+    }
+    .arrival-name { font-family:'Manrope',sans-serif; font-size:15px; font-weight:700; color:var(--on-surface); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .arrival-room { font-size:11px; color:var(--on-surface-variant); margin-top:2px; }
+
+    .arrival-dates { display:flex; align-items:center; gap:20px; flex-shrink:0; }
+    .arrival-date-col { text-align:center; }
+    .arrival-date-col .lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--on-surface-variant); }
+    .arrival-date-col .val { font-size:13px; font-weight:600; color:var(--on-surface); margin-top:2px; }
+    .arrival-divider { width:1px; height:28px; background:rgba(192,201,195,0.4); }
+
+    .arrival-rate { flex-shrink:0; text-align:right; }
+    .arrival-rate .lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--on-surface-variant); }
+    .arrival-rate .val { font-family:'Manrope',sans-serif; font-size:16px; font-weight:800; color:var(--primary); margin-top:2px; }
+
+    .arrival-chevron {
+      position:absolute; right:-14px; top:50%; transform:translateY(-50%);
+      width:28px; height:28px; border-radius:50%;
+      background:var(--primary); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; transition:opacity 0.2s;
+      pointer-events:none;
+    }
+    .arrival-row:hover .arrival-chevron { opacity:1; }
+
+    .dash-view-all {
+      display:flex; justify-content:center; padding-top:8px;
+    }
+    .dash-view-all button {
+      display:inline-flex; align-items:center; gap:8px;
+      background:none; border:none; cursor:pointer;
+      font-family:'Manrope',sans-serif; font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.08em;
+      color:var(--primary); transition:gap 0.2s;
+    }
+    .dash-view-all button:hover { gap:14px; }
+    .dash-view-all button .mso { font-size:18px; }
   </style>
 </head>
 <body>
 
-<!-- ── SIDEBAR ── -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
+<!-- ══════════════════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-bg-accent"></div>
+  <div class="login-wrap">
+
+    <div class="login-brand">
+      <div class="login-logo"><span class="mso">domain</span></div>
+      <h1>Evansen Co Living</h1>
+      <p>Property Management System</p>
+    </div>
+
+    <div class="login-card">
+      <div class="login-card-accent"></div>
+      <header>
+        <h2>Welcome Back</h2>
+        <p>Sign in to manage your properties.</p>
+      </header>
+
+      <div class="login-error" id="login-error">
+        <span class="mso">error</span>
+        <span id="login-error-msg">Invalid email or password.</span>
+      </div>
+
+      <div class="login-field">
+        <div class="login-field-header">
+          <label for="login-email">Email Address</label>
+        </div>
+        <div class="login-field-wrap">
+          <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" />
+          <span class="login-field-icon mso">mail</span>
+        </div>
+      </div>
+
+      <div class="login-field">
+        <div class="login-field-header">
+          <label for="login-password">Password</label>
+        </div>
+        <div class="login-field-wrap">
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"
+                 onkeydown="if(event.key==='Enter') doLogin()" />
+          <span class="login-field-icon mso">lock</span>
+        </div>
+      </div>
+
+      <button class="login-submit" id="login-btn" onclick="doLogin()">
+        Sign In <span class="mso">arrow_forward</span>
+      </button>
+
+      <div class="login-footer">
+        Contact your administrator to request access.
+      </div>
+    </div>
+
+    <div class="login-tagline">Precision &bull; Elegance &bull; Performance</div>
   </div>
+</div>
 
-  <button class="nav-item" onclick="showPage('reservation', this)" title="">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-      <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-    </svg>
-    <span class="tooltip">Reservation</span>
-  </button>
+<!-- ══════════════════════════════════════════════════════════
+     APP
+══════════════════════════════════════════════════════════ -->
+<div id="app">
 
-  <button class="nav-item active" onclick="showPage('database', this)" title="">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-    </svg>
-    <span class="tooltip">Database</span>
-  </button>
-
-  <button class="nav-item" onclick="showPage('availability', this)" title="">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
-      <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-      <rect x="7" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/>
-      <rect x="14" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/>
-    </svg>
-    <span class="tooltip">Availability</span>
-  </button>
-
-  <button class="nav-item" onclick="showPage('settings', this)" title="">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
-    <span class="tooltip">Settings</span>
-  </button>
-
-  <div class="sidebar-spacer"></div>
-</aside>
-
-<!-- ── MAIN ── -->
-<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><span class="mso">domain</span></div>
+      <div class="sidebar-brand-text">
+        <h1>Evansen</h1>
+        <p>Co Living PMS</p>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="mso">grid_view</span><span class="label">Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="showPage('reservations',this)">
+        <span class="mso">book_online</span><span class="label">Reservations</span>
+      </button>
+      <button class="nav-item" onclick="showPage('calendar',this)">
+        <span class="mso">calendar_month</span><span class="label">Calendar</span>
+      </button>
+      <button class="nav-item" onclick="showPage('rates',this)">
+        <span class="mso">payments</span><span class="label">Rates</span>
+      </button>
+      <button class="nav-item" onclick="showPage('settings',this)">
+        <span class="mso">settings</span><span class="label">Settings</span>
+      </button>
+      <!-- Admin only — shown/hidden by JS -->
+      <button class="nav-item hidden-nav" id="nav-admin" onclick="showPage('admin',this)">
+        <span class="mso">shield_person</span><span class="label">Admin</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"><span class="mso">person</span></div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-email">—</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">User</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="doLogout()">
+        <span class="mso">logout</span><span class="label">Logout</span>
+      </button>
+    </div>
+  </aside>
 
   <!-- TOPBAR -->
-  <div class="topbar" id="topbar">
-    <div>
-      <div class="topbar-title" id="topbar-title">Database</div>
-      <div class="topbar-subtitle" id="topbar-subtitle">All reservations</div>
-    </div>
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Reservations</span>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content">
+  <!-- MAIN -->
+  <main class="main">
 
-    <!-- DATABASE PAGE -->
-    <div class="page active" id="page-database">
-      <div class="toolbar">
-        <div class="search-box">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" id="db-search" placeholder="Search reservations..." oninput="filterTable()" />
-        </div>
-        <button class="filter-btn" onclick="filterByStatus('all')" id="filter-all">
-          All
-        </button>
-        <button class="filter-btn" onclick="filterByStatus('New Reservation')" id="filter-new">
-          <span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block"></span> Active
-        </button>
-        <button class="filter-btn" onclick="filterByStatus('Cancelled')" id="filter-cancelled">
-          <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block"></span> Cancelled
-        </button>
-        <div class="toolbar-spacer"></div>
-        <button class="btn-primary" onclick="showPage('reservation', document.querySelector('.nav-item'))">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          New Reservation
-        </button>
-      </div>
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="dash-wrap">
 
-      <div class="table-card">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Conf. No.</th>
-                <th>Created</th>
-                <th>Status</th>
-                <th>Guest Name</th>
-                <th>Arrival</th>
-                <th>Departure</th>
-                <th>Rate</th>
-                <th>Country</th>
-                <th>Channel</th>
-                <th>Room</th>
-                <th>Arr. Month</th>
-                <th>Nights</th>
-                <th>Revenue</th>
-              </tr>
-            </thead>
-            <tbody id="reservation-table-body">
-              <tr><td colspan="13" class="empty-state">No reservations yet</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-footer">
-          <span id="table-count">0 reservations</span>
-          <div class="pagination" id="pagination"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RESERVATION PAGE -->
-    <div class="page" id="page-reservation">
-      <div class="form-card">
-        <div class="form-section-title">Guest Information</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Guest Name</label>
-            <input type="text" id="guest-name" placeholder="Enter guest name" />
+        <!-- Greeting + CTA -->
+        <div class="dash-greeting">
+          <div>
+            <h2>Portfolio Overview</h2>
+            <p>Welcome back. Here's what's happening across your property today.</p>
           </div>
-          <div class="form-group">
-            <label>Country</label>
-            <div class="country-wrap">
-              <select id="country-select" onchange="handleCountrySelect(this)">
-                <option value="">Select country...</option>
-                <option value="__other__">＋ Type a new country...</option>
-              </select>
-              <div class="country-custom-row" id="country-custom-row" style="display:none">
-                <input type="text" id="country-custom" placeholder="Enter country name..." />
-                <button class="btn-sm" type="button" onclick="cancelCustomCountry()" style="background:var(--border);color:var(--text-secondary);padding:8px 10px">✕</button>
-              </div>
-              <div class="country-hint" id="country-hint" style="display:none">
-                This country will be <span onclick="focusCustomCountry()">auto-added</span> to the Settings list on save.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section-title" style="margin-top:20px">Stay Details</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Arrival Date</label>
-            <input type="date" id="arrival-date" onchange="
-              document.getElementById('departure-date').min = this.value;
-              if(document.getElementById('departure-date').value && document.getElementById('departure-date').value <= this.value) document.getElementById('departure-date').value = '';
-              checkAvailability();
-            " />
-          </div>
-          <div class="form-group">
-            <label>Departure Date</label>
-            <input type="date" id="departure-date" onchange="checkAvailability()" />
-          </div>
-          <div class="form-group">
-            <label>Rate (per night)</label>
-            <div class="input-prefix-wrap">
-              <span class="input-prefix">IDR</span>
-              <input type="number" id="rate" placeholder="0" min="0" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Channel</label>
-            <select id="channel-select">
-              <option value="">Select channel...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Room</label>
-            <select id="room-select" onchange="checkAvailability()">
-              <option value="">Select room...</option>
-            </select>
-            <div class="avail-warning" id="room-avail-warning">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              Room not available for selected dates
-            </div>
-          </div>
-        </div>
-
-        <hr class="form-divider" />
-        <div class="form-actions">
-          <button class="btn-primary" onclick="saveReservation()">Save Reservation</button>
-          <button class="btn-outline" onclick="clearForm()">Clear</button>
-          <div class="conf-chip" id="conf-chip">
-            <span class="conf-chip-label">Confirmed</span>
-            <div class="conf-chip-divider"></div>
-            <span class="conf-chip-number" id="conf-chip-number">–</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AVAILABILITY PAGE -->
-    <div class="page" id="page-availability">
-      <div class="avail-header">
-        <div class="avail-nav">
-          <button class="avail-nav-btn" onclick="changeMonth(-1)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <button class="dash-new-btn" onclick="showPage('reservations', document.querySelector('[onclick*=reservations]')); setTimeout(()=>showScreen('new-booking'),50)">
+            <span class="mso">add_circle</span>New Reservation
           </button>
-          <div class="avail-month-display">
-            <span class="avail-month-name" id="avail-month-name">–</span>
-            <span class="avail-month-year" id="avail-month-year">–</span>
-          </div>
-          <button class="avail-nav-btn" onclick="changeMonth(1)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <button class="avail-today-btn" onclick="goToToday()">Today</button>
         </div>
-        <div class="avail-legend" id="avail-legend"></div>
-      </div>
 
-      <div class="avail-calendar" id="avail-calendar">
-        <div class="cal-dow-row">
-          <div class="cal-dow">Sunday</div>
-          <div class="cal-dow">Monday</div>
-          <div class="cal-dow">Tuesday</div>
-          <div class="cal-dow">Wednesday</div>
-          <div class="cal-dow">Thursday</div>
-          <div class="cal-dow">Friday</div>
-          <div class="cal-dow">Saturday</div>
+        <!-- KPI Bento -->
+        <div class="dash-kpi">
+          <div class="kpi-card kpi-card-light">
+            <div class="kpi-bg-orb"></div>
+            <span class="kpi-label">Total Reservations</span>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-total">—</span>
+              <span class="kpi-badge" id="kpi-active-badge"></span>
+            </div>
+            <p class="kpi-sub" id="kpi-total-sub">Loading…</p>
+          </div>
+          <div class="kpi-card kpi-card-light">
+            <div class="kpi-bg-orb"></div>
+            <span class="kpi-label">Total Room Nights</span>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-nights">—</span>
+            </div>
+            <p class="kpi-sub" id="kpi-nights-sub">Across all units</p>
+          </div>
+          <div class="kpi-card kpi-card-dark">
+            <div class="kpi-bg-orb"></div>
+            <span class="kpi-label">Total Revenue</span>
+            <span class="kpi-value">IDR</span>
+            <span class="kpi-value-large" id="kpi-revenue">—</span>
+            <div class="kpi-sub" style="margin-top:14px">
+              <span class="mso">trending_up</span>
+              <span id="kpi-revenue-sub">All confirmed bookings</span>
+            </div>
+          </div>
         </div>
-        <div class="cal-weeks" id="cal-weeks"></div>
+
+        <!-- Upcoming Arrivals -->
+        <div class="dash-section-header">
+          <h3>Upcoming Arrivals</h3>
+          <div class="dash-section-meta">
+            <span>Next arrival:</span>
+            <strong id="dash-next-arrival">—</strong>
+          </div>
+        </div>
+
+        <div class="arrival-list" id="dash-arrival-list">
+          <div class="empty-state">Loading arrivals…</div>
+        </div>
+
+        <div class="dash-view-all">
+          <button onclick="showPage('reservations', document.querySelector('[onclick*=reservations]'))">
+            View all reservations <span class="mso">trending_flat</span>
+          </button>
+        </div>
+
       </div>
     </div>
 
-    <!-- SETTINGS PAGE -->
+    <!-- RESERVATIONS -->
+    <div class="page" id="page-reservations">
+
+      <!-- Screen A: Summary -->
+      <div class="screen active" id="screen-res-summary">
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="page-header-text"><h2>Reservations</h2><p>Latest bookings across all rooms</p></div>
+            <button class="btn-primary" onclick="showScreen('new-booking')">
+              <span class="mso">add</span>New Booking
+            </button>
+          </div>
+          <div class="res-list-header">
+            <span>Guest</span><span>Dates</span><span>Room</span><span>Status</span><span></span>
+          </div>
+          <div class="res-list" id="res-card-list"><div class="empty-state">Loading…</div></div>
+          <div class="stats-row">
+            <div class="stat-card stat-card-dark">
+              <div><div class="stat-label">Occupancy Rate</div><div class="stat-value" id="stat-occupancy">—</div></div>
+              <div class="stat-footer"><span class="mso" style="font-size:14px">trending_up</span>This month</div>
+            </div>
+            <div class="stat-card stat-card-light">
+              <div><div class="stat-label">Active Bookings</div><div class="stat-value" id="stat-active">—</div></div>
+              <div class="stat-footer"><span class="mso" style="font-size:14px">event_available</span>New reservations</div>
+            </div>
+            <div class="stat-card stat-card-light">
+              <div><div class="stat-label">Total Records</div><div class="stat-value" id="stat-total">—</div></div>
+              <div class="stat-footer"><span class="mso" style="font-size:14px">dataset</span>All time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen B: New Booking -->
+      <div class="screen" id="screen-new-booking">
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="page-header-text"><h2>New Booking</h2><p>Create a reservation for your property</p></div>
+            <button class="btn-ghost" onclick="showScreen('res-summary')">
+              <span class="mso" style="font-size:16px">arrow_back</span>Back
+            </button>
+          </div>
+          <div class="form-card">
+            <div class="form-section">
+              <div class="form-section-header"><span class="mso">person</span><h3>Guest Information</h3></div>
+              <div class="form-grid-2">
+                <div class="form-group"><label>Guest Name</label><input type="text" id="guest-name" placeholder="e.g. James Whitmore" /></div>
+                <div class="form-group"><label>Country</label><input type="text" id="country" placeholder="e.g. Indonesia" /></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="form-section-header"><span class="mso">date_range</span><h3>Stay Details</h3></div>
+              <div class="form-grid-4">
+                <div class="form-group"><label>Arrival</label><input type="date" id="arrival-date" onchange="checkAvailability()" /></div>
+                <div class="form-group"><label>Departure</label><input type="date" id="departure-date" onchange="checkAvailability()" /></div>
+                <div class="form-group"><label>Rate / Night (IDR)</label>
+                  <div class="rate-wrap"><span class="rate-prefix">IDR</span><input type="number" id="rate" placeholder="0" /></div>
+                </div>
+                <div class="form-group"><label>Channel</label><select id="channel-select"><option value="">Select channel…</option></select></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="form-section-header"><span class="mso">bed</span><h3>Room Selection</h3></div>
+              <div class="form-grid-2">
+                <div class="form-group"><label>Room / Unit</label><select id="room-select" onchange="checkAvailability()"><option value="">Select room…</option></select></div>
+                <div class="avail-notice" id="avail-notice"><span class="mso">info</span><p>Select dates and a room to check availability.</p></div>
+              </div>
+              <div class="form-group" style="margin-top:28px"><label>Notes (Optional)</label><textarea id="notes" placeholder="Special requests, early check-in, etc."></textarea></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-text" onclick="clearForm()"><span class="mso" style="font-size:16px">refresh</span>Clear Form</button>
+              <div class="form-actions-right">
+                <div class="save-chip" id="save-chip"><span class="mso">check_circle</span>Saved</div>
+                <button class="btn-ghost" onclick="showScreen('res-summary')">Cancel</button>
+                <button class="btn-primary" onclick="saveReservation()"><span class="mso">save</span>Save Reservation</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-reservations -->
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="page-wrap">
+        <div class="page-header"><div class="page-header-text"><h2>Calendar</h2><p>Availability view — coming soon</p></div></div>
+      </div>
+    </div>
+
+    <!-- RATES -->
+    <div class="page" id="page-rates">
+      <div class="page-wrap">
+        <div class="page-header"><div class="page-header-text"><h2>Rates</h2><p>Rate management — coming soon</p></div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
     <div class="page" id="page-settings">
-      <div class="settings-stack">
-
-        <!-- CHANNELS -->
-        <div class="acc-card" id="acc-channels">
-          <div class="acc-summary" onclick="toggleAcc('acc-channels')">
-            <div class="acc-summary-left">
-              <div class="acc-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
-              </div>
-              <span class="acc-title">Channels</span>
-              <span class="acc-badge" id="channel-count">0 items</span>
-            </div>
-            <div class="acc-summary-right">
-              <button class="acc-add-quick" onclick="openAccAndFocus(event,'acc-channels','new-channel')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add
-              </button>
-              <svg class="acc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
+      <div class="page-wrap">
+        <div class="page-header"><div class="page-header-text"><h2>Settings</h2><p>Manage channels and room names</p></div></div>
+        <div class="section">
+          <div class="section-label">Channels</div>
+          <div id="channel-list"></div>
+          <div class="add-row">
+            <input type="text" id="new-channel" placeholder="Add new channel…" onkeydown="if(event.key==='Enter') addChannel()" />
+            <button class="btn-primary" onclick="addChannel()">Add</button>
           </div>
-          <div class="acc-body">
-            <div class="acc-body-inner">
-              <div class="acc-list" id="channel-list"></div>
-              <div class="acc-add-row">
-                <input type="text" id="new-channel" placeholder="New channel name..." onkeydown="if(event.key==='Enter') addChannel()" />
-                <button class="btn-sm" onclick="addChannel()">Add</button>
-              </div>
-            </div>
+        </div>
+        <div class="section">
+          <div class="section-label">Room Names</div>
+          <div id="room-list"></div>
+          <div class="add-row">
+            <input type="text" id="new-room" placeholder="Add new room…" onkeydown="if(event.key==='Enter') addRoom()" />
+            <button class="btn-primary" onclick="addRoom()">Add</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-label">All Reservations</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Conf. No.</th><th>Created</th><th>Status</th><th>Guest</th><th>Arrival</th><th>Departure</th><th>Rate</th><th>Country</th><th>Channel</th><th>Room</th><th>Nights</th><th>Revenue</th></tr></thead>
+              <tbody id="reservation-table-body"><tr><td colspan="12" class="empty-state">No reservations yet</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN (master only) -->
+    <div class="page" id="page-admin">
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="page-header-text">
+            <h2>User Administration</h2>
+            <p>Manage who can access Evansen Co Living PMS</p>
           </div>
         </div>
 
-        <!-- ROOMS -->
-        <div class="acc-card" id="acc-rooms">
-          <div class="acc-summary" onclick="toggleAcc('acc-rooms')">
-            <div class="acc-summary-left">
-              <div class="acc-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              </div>
-              <span class="acc-title">Room Names</span>
-              <span class="acc-badge" id="room-count">0 items</span>
+        <!-- Invite new user -->
+        <div class="invite-card">
+          <div class="section-label">Invite New User</div>
+          <p style="font-size:13px;color:var(--secondary);line-height:1.6">
+            Enter the email and a temporary password. The user will be able to sign in immediately. Only you can see this page.
+          </p>
+          <div class="invite-row">
+            <div class="invite-field">
+              <label>Email Address</label>
+              <input type="email" id="invite-email" placeholder="user@example.com" />
             </div>
-            <div class="acc-summary-right">
-              <button class="acc-add-quick" onclick="openAccAndFocus(event,'acc-rooms','new-room')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add
-              </button>
-              <svg class="acc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <div class="invite-field">
+              <label>Temporary Password</label>
+              <input type="text" id="invite-password" placeholder="Min. 6 characters" />
             </div>
+            <button class="btn-primary" onclick="inviteUser()">
+              <span class="mso">person_add</span>Create User
+            </button>
           </div>
-          <div class="acc-body">
-            <div class="acc-body-inner">
-              <div class="acc-list" id="room-list"></div>
-              <div class="acc-add-row">
-                <input type="text" id="new-room" placeholder="New room name..." onkeydown="if(event.key==='Enter') addRoom()" />
-                <button class="btn-sm" onclick="addRoom()">Add</button>
-              </div>
-            </div>
-          </div>
+          <div id="invite-feedback" style="margin-top:14px;font-size:12px;display:none"></div>
         </div>
 
-        <!-- COUNTRIES -->
-        <div class="acc-card" id="acc-countries">
-          <div class="acc-summary" onclick="toggleAcc('acc-countries')">
-            <div class="acc-summary-left">
-              <div class="acc-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <span class="acc-title">Countries</span>
-              <span class="acc-badge" id="country-count">0 items</span>
-            </div>
-            <div class="acc-summary-right">
-              <button class="acc-add-quick" onclick="openAccAndFocus(event,'acc-countries','new-country')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add
-              </button>
-              <svg class="acc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-          </div>
-          <div class="acc-body">
-            <div class="acc-body-inner">
-              <div class="acc-list" id="country-list"></div>
-              <div class="acc-add-row">
-                <input type="text" id="new-country" placeholder="New country name..." onkeydown="if(event.key==='Enter') addCountry()" />
-                <button class="btn-sm" onclick="addCountry()">Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- User list -->
+        <div class="section-label" style="padding:0 4px;margin-bottom:14px">Existing Users</div>
+        <div id="user-list"><div class="empty-state">Loading users…</div></div>
 
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
+  </main>
+</div><!-- /app -->
 
-<!-- Availability popup -->
-<div class="avail-popup" id="avail-popup">
-  <div class="popup-banner">
-    <div class="popup-banner-left">
-      <span class="popup-room-dot" id="popup-dot"></span>
-      <span class="popup-room-name" id="popup-room"></span>
-    </div>
-    <button class="popup-close" onclick="closePopup()">✕</button>
-  </div>
-  <div class="popup-body">
-    <div class="popup-row">
-      <span class="popup-label">Guest</span>
-      <span class="popup-value" id="popup-guest"></span>
-    </div>
-    <div class="popup-row">
-      <span class="popup-label">Dates</span>
-      <span class="popup-value">
-        <span id="popup-arrival"></span> — <span id="popup-departure"></span>
-      </span>
-    </div>
-    <div class="popup-row">
-      <span class="popup-label">Nights</span>
-      <span class="popup-value" id="popup-nights"></span>
-    </div>
-    <div class="popup-row">
-      <span class="popup-label">Conf. No.</span>
-      <span class="popup-value popup-conf" id="popup-conf"></span>
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirm Action</h3>
+    <p id="modal-body">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-danger" id="modal-confirm-btn">Confirm</button>
     </div>
   </div>
 </div>
@@ -1363,712 +1026,566 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── SUPABASE CONFIG ──────────────────────────────────────────
-  const SUPABASE_URL = 'https://qhyrdlaeeruyireocfbl.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoeXJkbGFlZXJ1eWlyZW9jZmJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzExNjEsImV4cCI6MjA5MDEwNzE2MX0.QG_6ZV0p51pejAZMbX1gcKbov43jRxDthki2abMMpNs';
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* ══════════════════════════════════════════════════════════
+   SUPABASE INIT
+══════════════════════════════════════════════════════════ */
+const SUPABASE_URL      = 'https://qhyrdlaeeruyireocfbl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoeXJkbGFlZXJ1eWlyZW9jZmJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzExNjEsImV4cCI6MjA5MDEwNzE2MX0.QG_6ZV0p51pejAZMbX1gcKbov43jRxDthki2abMMpNs';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ── STATE ────────────────────────────────────────────────────
-  let allReservations = [];
-  let currentFilter = 'all';
-  let currentPage = 1;
-  const rowsPerPage = 10;
+const MASTER_EMAIL = 'evansen.coliving@gmail.com';
 
-  // ── NAVIGATION ───────────────────────────────────────────────
-  const pageTitles = {
-    database: { title: 'Database', subtitle: 'All reservations' },
-    reservation: { title: 'New Reservation', subtitle: 'Create a new booking' },
-    availability: { title: 'Availability', subtitle: 'Room occupancy calendar' },
-    settings: { title: 'Settings', subtitle: 'Manage channels, rooms and countries' }
-  };
+/* ══════════════════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════════════════ */
+let currentUser = null;
 
-  function showPage(page, clickedBtn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    if (clickedBtn) clickedBtn.classList.add('active');
+async function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn      = document.getElementById('login-btn');
+  const errBox   = document.getElementById('login-error');
+  const errMsg   = document.getElementById('login-error-msg');
 
-    const info = pageTitles[page];
-    document.getElementById('topbar-title').textContent = info.title;
-    document.getElementById('topbar-subtitle').textContent = info.subtitle;
+  errBox.classList.remove('show');
+  btn.disabled = true;
+  btn.innerHTML = 'Signing in… <span class="mso">hourglass_empty</span>';
 
-    if (page === 'reservation') loadDropdowns();
-    if (page === 'database') loadReservations();
-    if (page === 'availability') loadAvailability();
-    if (page === 'settings') { loadChannels(); loadRooms(); loadCountries(); }
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+  btn.disabled = false;
+  btn.innerHTML = 'Sign In <span class="mso">arrow_forward</span>';
+
+  if (error) {
+    errMsg.textContent = error.message || 'Invalid email or password.';
+    errBox.classList.add('show');
+    return;
   }
 
-  // ── TOAST ────────────────────────────────────────────────────
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+  currentUser = data.user;
+  enterApp();
+}
+
+async function doLogout() {
+  await db.auth.signOut();
+  currentUser = null;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+function enterApp() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('app').classList.add('active');
+
+  const isMaster = currentUser.email === MASTER_EMAIL;
+
+  // Sidebar user pill
+  document.getElementById('sidebar-user-email').textContent = currentUser.email;
+  document.getElementById('sidebar-user-role').textContent = isMaster ? 'Administrator' : 'Staff';
+
+  // Show admin nav only for master
+  const navAdmin = document.getElementById('nav-admin');
+  if (isMaster) navAdmin.classList.remove('hidden-nav');
+  else navAdmin.classList.add('hidden-nav');
+
+  // Default to dashboard
+  showPage('dashboard', document.querySelector('.nav-item.active'));
+}
+
+// Check existing session on load
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    enterApp();
   }
-
-  // ── ACCORDION ────────────────────────────────────────────────
-  function toggleAcc(id) {
-    const card = document.getElementById(id);
-    card.classList.toggle('open');
-  }
-
-  function openAccAndFocus(event, accId, inputId) {
-    event.stopPropagation();
-    const card = document.getElementById(accId);
-    if (!card.classList.contains('open')) card.classList.add('open');
-    setTimeout(() => document.getElementById(inputId)?.focus(), 280);
-  }
-
-  // ── SETTINGS: CHANNELS ───────────────────────────────────────
-  async function loadChannels() {
-    const { data } = await db.from('channels').select('*').order('created_at');
-    const list = document.getElementById('channel-list');
-    const count = document.getElementById('channel-count');
-    list.innerHTML = '';
-    if (!data || data.length === 0) {
-      list.innerHTML = '<p class="empty-state">No channels yet</p>';
-      count.textContent = '0 items';
-      return;
-    }
-    count.textContent = data.length + ' item' + (data.length !== 1 ? 's' : '');
-    data.forEach(ch => {
-      list.innerHTML += `
-        <div class="settings-item">
-          <span>${ch.name}</span>
-          <button class="remove-btn" onclick="removeChannel('${ch.id}')">✕</button>
-        </div>`;
-    });
-  }
-
-  async function addChannel() {
-    const input = document.getElementById('new-channel');
-    const name = input.value.trim();
-    if (!name) return showToast('Please enter a channel name');
-    const { error } = await db.from('channels').insert({ name });
-    if (error) return showToast('Error adding channel');
-    input.value = '';
-    loadChannels();
-    showToast('Channel added ✓');
-  }
-
-  async function removeChannel(id) {
-    await db.from('channels').delete().eq('id', id);
-    loadChannels();
-    showToast('Channel removed');
-  }
-
-  // ── SETTINGS: ROOMS ──────────────────────────────────────────
-  async function loadRooms() {
-    const { data } = await db.from('rooms').select('*').order('created_at');
-    const list = document.getElementById('room-list');
-    const count = document.getElementById('room-count');
-    list.innerHTML = '';
-    if (!data || data.length === 0) {
-      list.innerHTML = '<p class="empty-state">No rooms yet</p>';
-      count.textContent = '0 items';
-      return;
-    }
-    count.textContent = data.length + ' item' + (data.length !== 1 ? 's' : '');
-    data.forEach(r => {
-      list.innerHTML += `
-        <div class="settings-item">
-          <span>${r.name}</span>
-          <button class="remove-btn" onclick="removeRoom('${r.id}')">✕</button>
-        </div>`;
-    });
-  }
-
-  async function addRoom() {
-    const input = document.getElementById('new-room');
-    const name = input.value.trim();
-    if (!name) return showToast('Please enter a room name');
-    const { error } = await db.from('rooms').insert({ name });
-    if (error) return showToast('Error adding room');
-    input.value = '';
-    loadRooms();
-    showToast('Room added ✓');
-  }
-
-  async function removeRoom(id) {
-    await db.from('rooms').delete().eq('id', id);
-    loadRooms();
-    showToast('Room removed');
-  }
-
-  // ── RESERVATION: DROPDOWNS ───────────────────────────────────
-  async function loadDropdowns() {
-    const { data: channels } = await db.from('channels').select('*').order('created_at');
-    const { data: rooms } = await db.from('rooms').select('*').order('created_at');
-    const { data: countries } = await db.from('countries').select('*').order('name');
-
-    const chSel = document.getElementById('channel-select');
-    chSel.innerHTML = '<option value="">Select channel...</option>';
-    channels?.forEach(c => chSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-
-    const rmSel = document.getElementById('room-select');
-    rmSel.innerHTML = '<option value="">Select room...</option>';
-    rooms?.forEach(r => rmSel.innerHTML += `<option value="${r.name}">${r.name}</option>`);
-
-    const ctSel = document.getElementById('country-select');
-    ctSel.innerHTML = '<option value="">Select country...</option>';
-    countries?.forEach(c => ctSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-    ctSel.innerHTML += '<option value="__other__">＋ Type a new country...</option>';
-  }
-
-  // ── RESERVATION: SAVE ────────────────────────────────────────
-  function generateConfNumber() {
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const letters = Array.from({length: 3}, () =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
-    return date + letters;
-  }
-
-  async function saveReservation() {
-    const guestName     = document.getElementById('guest-name').value.trim();
-    const arrivalDate   = document.getElementById('arrival-date').value;
-    const departureDate = document.getElementById('departure-date').value;
-    const rate          = parseFloat(document.getElementById('rate').value);
-    const channel       = document.getElementById('channel-select').value;
-    const roomName      = document.getElementById('room-select').value;
-
-    // Country: from dropdown or custom input
-    const countrySelect = document.getElementById('country-select').value;
-    const countryCustom = document.getElementById('country-custom').value.trim();
-    const isCustom = countrySelect === '__other__';
-    const country = isCustom ? countryCustom : countrySelect;
-
-    if (!guestName || !arrivalDate || !departureDate || !rate || !channel || !roomName || !country)
-      return showToast('Please fill in all required fields');
-    if (departureDate <= arrivalDate)
-      return showToast('Departure must be after arrival');
-
-    // Availability conflict check
-    const arrNew = new Date(arrivalDate);
-    const depNew = new Date(departureDate);
-    const conflict = allReservations.some(r =>
-      r.status === 'New Reservation' &&
-      r.room_name === roomName &&
-      parseDate(r.arrival_date) < depNew &&
-      parseDate(r.departure_date) > arrNew
-    );
-    if (conflict) return showToast('Room not available for selected dates');
-
-    // Auto-add new country to countries table if custom
-    if (isCustom && country) {
-      const { data: existing } = await db.from('countries').select('id').ilike('name', country);
-      if (!existing || existing.length === 0) {
-        await db.from('countries').insert({ name: country });
-        showToast(`"${country}" added to Countries list ✓`);
-      }
-    }
-
-    const arrival     = new Date(arrivalDate);
-    const departure   = new Date(departureDate);
-    const roomNight   = Math.round((departure - arrival) / (1000 * 60 * 60 * 24));
-    const roomRevenue = roomNight * rate;
-    const arrivalMonth = arrival.toLocaleString('default', { month: 'long', year: 'numeric' });
-
-    let confNumber, exists = true;
-    while (exists) {
-      confNumber = generateConfNumber();
-      const { data } = await db.from('reservations').select('id').eq('confirmation_number', confNumber);
-      exists = data && data.length > 0;
-    }
-
-    const { error } = await db.from('reservations').insert({
-      confirmation_number: confNumber,
-      guest_name: guestName,
-      arrival_date: arrivalDate,
-      departure_date: departureDate,
-      rate, country, channel,
-      room_name: roomName,
-      arrival_month: arrivalMonth,
-      room_night: roomNight,
-      room_revenue: roomRevenue,
-      status: 'New Reservation'
-    });
-
-    if (error) return showToast('Error saving reservation');
-
-    // Show persistent confirmation chip next to Save button
-    document.getElementById('conf-chip-number').textContent = confNumber;
-    document.getElementById('conf-chip').classList.add('visible');
-    clearForm(false); // clear fields but keep chip visible
-  }
-
-  function clearForm(hideChip = true) {
-    ['guest-name','arrival-date','departure-date','rate','country-custom'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    document.getElementById('channel-select').value = '';
-    document.getElementById('room-select').value = '';
-    document.getElementById('country-select').value = '';
-    document.getElementById('country-custom-row').style.display = 'none';
-    document.getElementById('country-hint').style.display = 'none';
-    document.getElementById('room-avail-warning').classList.remove('show');
-    document.getElementById('room-select').classList.remove('error');
-    if (hideChip) {
-      document.getElementById('conf-chip').classList.remove('visible');
-      document.getElementById('conf-chip-number').textContent = '–';
-    }
-  }
-
-  // ── COUNTRY COMBOBOX LOGIC ───────────────────────────────────
-  function handleCountrySelect(sel) {
-    const customRow = document.getElementById('country-custom-row');
-    const hint = document.getElementById('country-hint');
-    if (sel.value === '__other__') {
-      customRow.style.display = 'flex';
-      hint.style.display = 'block';
-      document.getElementById('country-custom').focus();
-    } else {
-      customRow.style.display = 'none';
-      hint.style.display = 'none';
-      document.getElementById('country-custom').value = '';
-    }
-  }
-
-  function cancelCustomCountry() {
-    document.getElementById('country-select').value = '';
-    document.getElementById('country-custom-row').style.display = 'none';
-    document.getElementById('country-hint').style.display = 'none';
-    document.getElementById('country-custom').value = '';
-  }
-
-  function focusCustomCountry() {
-    document.getElementById('country-custom').focus();
-  }
-
-  // ── DATABASE ─────────────────────────────────────────────────
-  async function loadReservations() {
-    const { data } = await db.from('reservations').select('*').order('created_date', { ascending: false });
-    allReservations = data || [];
-    currentPage = 1;
-    renderTable();
-  }
-
-  function filterByStatus(status) {
-    currentFilter = status;
-    currentPage = 1;
-    document.querySelectorAll('.filter-btn').forEach(b => b.style.fontWeight = '');
-    const map = { all: 'filter-all', 'New Reservation': 'filter-new', Cancelled: 'filter-cancelled' };
-    if (map[status]) document.getElementById(map[status]).style.fontWeight = '600';
-    renderTable();
-  }
-
-  function filterTable() { currentPage = 1; renderTable(); }
-
-  function renderTable() {
-    const search = document.getElementById('db-search').value.toLowerCase();
-    let filtered = allReservations;
-
-    if (currentFilter !== 'all')
-      filtered = filtered.filter(r => r.status === currentFilter);
-
-    if (search)
-      filtered = filtered.filter(r =>
-        [r.guest_name, r.confirmation_number, r.country, r.channel, r.room_name]
-          .some(v => v && v.toLowerCase().includes(search))
-      );
-
-    const total = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(total / rowsPerPage));
-    const start = (currentPage - 1) * rowsPerPage;
-    const pageData = filtered.slice(start, start + rowsPerPage);
-
-    const tbody = document.getElementById('reservation-table-body');
-    if (pageData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="13" class="empty-state">No reservations found</td></tr>';
-    } else {
-      tbody.innerHTML = pageData.map(r => `
-        <tr>
-          <td class="mono">${r.confirmation_number}</td>
-          <td>${r.created_date || '-'}</td>
-          <td>
-            <select class="status-select status-pill ${r.status === 'Cancelled' ? 'status-cancelled' : 'status-new'}"
-              onchange="updateStatus('${r.id}', this.value, this)">
-              <option ${r.status === 'New Reservation' ? 'selected' : ''}>New Reservation</option>
-              <option ${r.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-            </select>
-          </td>
-          <td style="font-weight:500">${r.guest_name}</td>
-          <td>${r.arrival_date}</td>
-          <td>${r.departure_date}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:12px">${Number(r.rate).toLocaleString()}</td>
-          <td>${r.country || '–'}</td>
-          <td>${r.channel}</td>
-          <td>${r.room_name}</td>
-          <td>${r.arrival_month}</td>
-          <td style="text-align:center">${r.room_night}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500">${Number(r.room_revenue).toLocaleString()}</td>
-        </tr>`).join('');
-    }
-
-    document.getElementById('table-count').textContent =
-      total + ' reservation' + (total !== 1 ? 's' : '');
-
-    // Pagination
-    const pag = document.getElementById('pagination');
-    pag.innerHTML = '';
-    if (totalPages <= 1) return;
-
-    const addBtn = (label, page, disabled, active) => {
-      const btn = document.createElement('button');
-      btn.className = 'page-btn' + (active ? ' active' : '');
-      btn.textContent = label;
-      btn.disabled = disabled;
-      if (!disabled) btn.onclick = () => { currentPage = page; renderTable(); };
-      pag.appendChild(btn);
-    };
-
-    addBtn('‹', currentPage - 1, currentPage === 1, false);
-    for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1)
-        addBtn(i, i, false, i === currentPage);
-      else if (Math.abs(i - currentPage) === 2) {
-        const dots = document.createElement('span');
-        dots.textContent = '…';
-        dots.style.cssText = 'padding:0 4px;color:var(--text-muted);font-size:12px';
-        pag.appendChild(dots);
-      }
-    }
-    addBtn('›', currentPage + 1, currentPage === totalPages, false);
-  }
-
-  async function updateStatus(id, newStatus, selectEl) {
-    await db.from('reservations').update({ status: newStatus }).eq('id', id);
-    selectEl.className = `status-select status-pill ${newStatus === 'Cancelled' ? 'status-cancelled' : 'status-new'}`;
-    // Update local data too
-    const r = allReservations.find(x => x.id === id);
-    if (r) r.status = newStatus;
-    showToast('Status updated ✓');
-  }
-
-  // ── SETTINGS: COUNTRIES ──────────────────────────────────────
-  async function loadCountries() {
-    const { data } = await db.from('countries').select('*').order('name');
-    const list = document.getElementById('country-list');
-    const count = document.getElementById('country-count');
-    list.innerHTML = '';
-    if (!data || data.length === 0) {
-      list.innerHTML = '<p class="empty-state">No countries yet</p>';
-      count.textContent = '0 items';
-      return;
-    }
-    count.textContent = data.length + ' item' + (data.length !== 1 ? 's' : '');
-    data.forEach(c => {
-      list.innerHTML += `
-        <div class="settings-item">
-          <span>${c.name}</span>
-          <button class="remove-btn" onclick="removeCountry('${c.id}')">✕</button>
-        </div>`;
-    });
-  }
-
-  async function addCountry() {
-    const input = document.getElementById('new-country');
-    const name = input.value.trim();
-    if (!name) return showToast('Please enter a country name');
-    const { data: existing } = await db.from('countries').select('id').ilike('name', name);
-    if (existing && existing.length > 0) return showToast('Country already exists');
-    const { error } = await db.from('countries').insert({ name });
-    if (error) return showToast('Error adding country');
-    input.value = '';
-    loadCountries();
-    showToast('Country added ✓');
-  }
-
-  async function removeCountry(id) {
-    await db.from('countries').delete().eq('id', id);
-    loadCountries();
-    showToast('Country removed');
-  }
-
-  // ── AVAILABILITY ─────────────────────────────────────────────
-  const ROOM_COLORS = [
-    '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
-    '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'
-  ];
-  let roomColorMap = {};
-  let availReservations = [];
-  let calYear, calMonth; // 0-based month
-
-  function getRoomColor(roomName) {
-    if (!roomColorMap[roomName]) {
-      const keys = Object.keys(roomColorMap);
-      roomColorMap[roomName] = ROOM_COLORS[keys.length % ROOM_COLORS.length];
-    }
-    return roomColorMap[roomName];
-  }
-
-  async function loadAvailability() {
-    const { data } = await db.from('reservations')
-      .select('*')
-      .eq('status', 'New Reservation')
-      .order('arrival_date');
-    availReservations = data || [];
-
-    // Build room color map in sorted room order
-    roomColorMap = {};
-    [...new Set(availReservations.map(r => r.room_name))].sort().forEach(r => getRoomColor(r));
-
-    renderLegend();
-    renderCalendar();
-  }
-
-  function renderLegend() {
-    const legend = document.getElementById('avail-legend');
-    legend.innerHTML = Object.entries(roomColorMap).map(([name, color]) => `
-      <div class="legend-item">
-        <div class="legend-dot" style="background:${color}"></div>
-        <span>${name}</span>
-      </div>`).join('');
-  }
-
-  function goToToday() {
-    const now = new Date();
-    calYear = now.getFullYear();
-    calMonth = now.getMonth();
-    renderCalendar();
-  }
-
-  function changeMonth(dir) {
-    calMonth += dir;
-    if (calMonth > 11) { calMonth = 0; calYear++; }
-    if (calMonth < 0)  { calMonth = 11; calYear--; }
-    renderCalendar();
-  }
-
-  function renderCalendar() {
-    const monthNames = ['January','February','March','April','May','June',
-                        'July','August','September','October','November','December'];
-    document.getElementById('avail-month-name').textContent = monthNames[calMonth];
-    document.getElementById('avail-month-year').textContent = calYear;
-
-    const today     = new Date();
-    const firstDay  = new Date(calYear, calMonth, 1);
-    const lastDay   = new Date(calYear, calMonth + 1, 0);
-
-    // Build weeks
-    const weeks = [];
-    let week = [];
-    for (let i = 0; i < firstDay.getDay(); i++) {
-      week.push({ date: new Date(calYear, calMonth, 1 - (firstDay.getDay() - i)), current: false });
-    }
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-      week.push({ date: new Date(calYear, calMonth, d), current: true });
-      if (week.length === 7) { weeks.push(week); week = []; }
-    }
-    if (week.length > 0) {
-      let nd = 1;
-      while (week.length < 7) week.push({ date: new Date(calYear, calMonth + 1, nd++), current: false });
-      weeks.push(week);
-    }
-
-    const weeksEl = document.getElementById('cal-weeks');
-    weeksEl.innerHTML = '';
-
-    weeks.forEach((week) => {
-      const weekEl = document.createElement('div');
-      weekEl.className = 'cal-week';
-
-      // Render day cells
-      week.forEach(({ date, current }) => {
-        const cell = document.createElement('div');
-        cell.className = 'cal-cell' +
-          (!current ? ' other-month' : '') +
-          (isSameDay(date, today) ? ' today' : '');
-        const numSpan = document.createElement('span');
-        numSpan.className = 'cal-day-num';
-        numSpan.textContent = date.getDate();
-        cell.appendChild(numSpan);
-        weekEl.appendChild(cell);
-      });
-
-      // Bar layer
-      const barsLayer = document.createElement('div');
-      barsLayer.className = 'cal-bars-layer';
-
-      const weekStart = week[0].date;
-      const weekEnd   = week[6].date;
-
-      // Collect reservations overlapping this week
-      const relevant = availReservations.filter(r => {
-        const arr    = parseDate(r.arrival_date);
-        const barEnd = new Date(parseDate(r.departure_date));
-        barEnd.setDate(barEnd.getDate() - 1); // exclude checkout
-        return arr <= weekEnd && barEnd >= weekStart;
-      });
-
-      relevant.sort((a, b) => parseDate(a.arrival_date) - parseDate(b.arrival_date));
-
-      // Track placement to avoid vertical overlap
-      const tracks = [];
-
-      relevant.forEach(res => {
-        const arr    = parseDate(res.arrival_date);
-        const dep    = parseDate(res.departure_date);
-        const barEnd = new Date(dep); barEnd.setDate(barEnd.getDate() - 1);
-
-        const visStart = arr < weekStart ? weekStart : arr;
-        const visEnd   = barEnd > weekEnd ? weekEnd : barEnd;
-
-        const startCol = dayIndex(visStart, weekStart);
-        const endCol   = dayIndex(visEnd, weekStart);
-        const spanCols = endCol - startCol + 1;
-
-        // Find a free track
-        let trackIdx = 0;
-        while (true) {
-          if (!tracks[trackIdx]) { tracks[trackIdx] = []; break; }
-          const conflict = tracks[trackIdx].some(b =>
-            !(b.endCol < startCol || b.startCol > endCol));
-          if (!conflict) break;
-          trackIdx++;
-        }
-        tracks[trackIdx].push({ startCol, endCol });
-
-        const color = getRoomColor(res.room_name);
-
-        // Determine rounding class
-        const isStart = isSameDay(arr, visStart);
-        const isEnd   = isSameDay(barEnd, visEnd);
-        let roundClass = 'bar-mid';
-        if (isStart && isEnd) roundClass = 'bar-both';
-        else if (isStart)     roundClass = 'bar-start';
-        else if (isEnd)       roundClass = 'bar-end';
-
-        // Position: bleed to cell edges, leave 1px gap between tracks
-        // Top offset: day-number area (~38px) + track * (bar height + gap)
-        const BAR_H = 26;
-        const BAR_GAP = 4;
-        const TOP_OFFSET = 38;
-
-        // Precise left/right: each col = 100%/7; no inner padding for bleed effect
-        const leftPct  = (startCol / 7 * 100).toFixed(4);
-        const widthPct = (spanCols / 7 * 100).toFixed(4);
-
-        const bar = document.createElement('div');
-        bar.className = `cal-bar ${roundClass}`;
-        bar.style.cssText = `
-          background: ${color};
-          left: ${leftPct}%;
-          width: ${widthPct}%;
-          top: ${TOP_OFFSET + trackIdx * (BAR_H + BAR_GAP)}px;
-          height: ${BAR_H}px;
-        `;
-
-        // Label: show room name + guest, only when bar starts this week or at col 0
-        const showLabel = isStart || startCol === 0;
-        bar.textContent = showLabel ? `${res.guest_name}` : '';
-        bar.title = `${res.room_name} — ${res.guest_name} (${formatDate(res.arrival_date)} → ${formatDate(res.departure_date)})`;
-
-        bar.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showReservationPopup(res, color, e);
-        });
-
-        barsLayer.appendChild(bar);
-      });
-
-      weekEl.appendChild(barsLayer);
-      weeksEl.appendChild(weekEl);
-    });
-  }
-
-  function parseDate(str) {
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  function isSameDay(a, b) {
-    return a.getFullYear() === b.getFullYear() &&
-           a.getMonth() === b.getMonth() &&
-           a.getDate() === b.getDate();
-  }
-
-  function dayIndex(date, weekStart) {
-    return Math.round((date - weekStart) / 86400000);
-  }
-
-  // ── POPUP ────────────────────────────────────────────────────
-  function showReservationPopup(res, color, event) {
-    const popup = document.getElementById('avail-popup');
-    document.getElementById('popup-dot').style.background = color;
-    document.getElementById('popup-room').textContent = res.room_name;
-    document.getElementById('popup-guest').textContent = res.guest_name;
-    document.getElementById('popup-arrival').textContent = formatDate(res.arrival_date);
-    document.getElementById('popup-departure').textContent = formatDate(res.departure_date);
-    document.getElementById('popup-nights').textContent = res.room_night + ' night' + (res.room_night !== 1 ? 's' : '');
-    document.getElementById('popup-conf').textContent = res.confirmation_number || '–';
-
-    // Position near click
-    const margin = 12;
-    let x = event.clientX + margin;
-    let y = event.clientY + margin;
-    if (x + 250 > window.innerWidth)  x = event.clientX - 250 - margin;
-    if (y + 220 > window.innerHeight) y = event.clientY - 220 - margin;
-    popup.style.left = x + 'px';
-    popup.style.top  = y + 'px';
-    popup.classList.add('show');
-  }
-
-  function closePopup() {
-    document.getElementById('avail-popup').classList.remove('show');
-  }
-
-  function formatDate(str) {
-    if (!str) return '–';
-    const [y, m, d] = str.split('-').map(Number);
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${d} ${months[m-1]} ${y}`;
-  }
-
-  // Close popup when clicking outside
-  document.addEventListener('click', (e) => {
-    const popup = document.getElementById('avail-popup');
-    if (popup.classList.contains('show') && !popup.contains(e.target)) closePopup();
+})();
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════ */
+const PAGE_TITLES = { dashboard:'Overview', reservations:'Reservations', calendar:'Calendar', rates:'Rates', settings:'Settings', admin:'Administration' };
+
+function showPage(page, btn) {
+  // Guard admin
+  if (page === 'admin' && currentUser?.email !== MASTER_EMAIL) return;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
+
+  if (page === 'dashboard')    loadDashboard();
+  if (page === 'reservations') { showScreen('res-summary'); loadResSummary(); }
+  if (page === 'settings')     { loadChannels(); loadRooms(); loadDbTable(); }
+  if (page === 'admin')        loadUserList();
+}
+
+function showScreen(screen) {
+  document.querySelectorAll('#page-reservations .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  if (screen === 'new-booking') loadDropdowns();
+  if (screen === 'res-summary') loadResSummary();
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════════════ */
+let _modalResolve = null;
+function showModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('confirm-modal').classList.add('show');
+  return new Promise(resolve => { _modalResolve = resolve; });
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('show');
+  if (_modalResolve) _modalResolve(false);
+}
+document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+  document.getElementById('confirm-modal').classList.remove('show');
+  if (_modalResolve) _modalResolve(true);
+});
+
+/* ══════════════════════════════════════════════════════════
+   ADMIN: USER MANAGEMENT
+══════════════════════════════════════════════════════════ */
+async function inviteUser() {
+  const email    = document.getElementById('invite-email').value.trim();
+  const password = document.getElementById('invite-password').value.trim();
+  const feedback = document.getElementById('invite-feedback');
+
+  if (!email || !password) { showToast('Email and password are required'); return; }
+  if (password.length < 6) { showToast('Password must be at least 6 characters'); return; }
+
+  feedback.style.display = 'none';
+
+  // Use admin API via Supabase service role — but since we only have anon key,
+  // we use signUp (creates user) then sign back in as master.
+  // We save current session to restore after.
+  const masterSession = (await db.auth.getSession()).data.session;
+
+  const { data, error } = await db.auth.admin.createUser({
+    email, password,
+    email_confirm: true
   });
 
-  // ── AVAILABILITY CHECK (Reservation form) ─────────────────────
-  function checkAvailability() {
-    const arrival   = document.getElementById('arrival-date').value;
-    const departure = document.getElementById('departure-date').value;
-    const room      = document.getElementById('room-select').value;
-    const warning   = document.getElementById('room-avail-warning');
-    const roomSel   = document.getElementById('room-select');
-
-    if (!arrival || !departure || !room) {
-      warning.classList.remove('show');
-      roomSel.classList.remove('error');
+  // Fallback: admin.createUser requires service role; use signUp instead
+  if (error && error.message && error.message.includes('not authorized')) {
+    // Store new user via signUp — creates them but logs us out; we re-login as master
+    const { error: signUpErr } = await db.auth.signUp({ email, password });
+    if (signUpErr) {
+      showToast('Error: ' + signUpErr.message);
       return;
     }
-
-    const arrNew = parseDate(arrival);
-    const depNew = parseDate(departure);
-
-    const conflict = allReservations.some(r =>
-      r.status === 'New Reservation' &&
-      r.room_name === room &&
-      parseDate(r.arrival_date) < depNew &&
-      parseDate(r.departure_date) > arrNew
-    );
-
-    if (conflict) {
-      warning.classList.add('show');
-      roomSel.classList.add('error');
-    } else {
-      warning.classList.remove('show');
-      roomSel.classList.remove('error');
-    }
+    // Re-authenticate as master
+    await db.auth.signInWithPassword({ email: MASTER_EMAIL, password: '177154177gG_' });
+    showToast('User created — they may need to confirm email ✓');
+  } else if (error) {
+    showToast('Error: ' + error.message);
+    return;
+  } else {
+    showToast('User created successfully ✓');
   }
 
-  // ── INIT ─────────────────────────────────────────────────────
-  const _now = new Date();
-  calYear = _now.getFullYear();
-  calMonth = _now.getMonth();
-  loadReservations();
+  document.getElementById('invite-email').value = '';
+  document.getElementById('invite-password').value = '';
+  loadUserList();
+}
+
+async function loadUserList() {
+  const list = document.getElementById('user-list');
+  list.innerHTML = '<div class="empty-state">Loading…</div>';
+
+  // Try admin API first (needs service role key — may not work with anon)
+  const { data, error } = await db.auth.admin.listUsers();
+
+  if (error || !data) {
+    // Fallback: show only current users we know about via a custom table
+    list.innerHTML = renderKnownUsers();
+    return;
+  }
+
+  const users = data.users || [];
+  if (users.length === 0) {
+    list.innerHTML = '<div class="empty-state">No users found.</div>';
+    return;
+  }
+
+  list.innerHTML = users.map(u => {
+    const isMaster = u.email === MASTER_EMAIL;
+    return `
+      <div class="user-card">
+        <div class="user-avatar ${isMaster ? 'master' : ''}">
+          <span class="mso">person</span>
+        </div>
+        <div>
+          <div class="user-name">${u.email}</div>
+          <div class="user-email">ID: ${u.id.slice(0,8)}… · Created ${fmtDate(u.created_at?.slice(0,10))}</div>
+        </div>
+        <span class="user-role-chip ${isMaster ? 'role-master' : 'role-user'}">
+          ${isMaster ? 'Master Admin' : 'Staff'}
+        </span>
+        ${isMaster ? '' : `<button class="btn-danger" onclick="deleteUser('${u.id}', '${u.email}')"><span class="mso" style="font-size:15px">person_remove</span>Revoke</button>`}
+      </div>`;
+  }).join('');
+}
+
+function renderKnownUsers() {
+  // When admin API isn't available with anon key, show a message
+  return `
+    <div class="section" style="text-align:center;padding:32px">
+      <span class="mso" style="font-size:36px;color:var(--on-surface-variant);display:block;margin-bottom:12px">info</span>
+      <p style="font-size:13px;color:var(--secondary);line-height:1.7;max-width:380px;margin:0 auto">
+        User listing requires the <strong>Supabase Service Role key</strong>. 
+        With the anon key, you can still create users above — they will appear after 
+        you add the service role key to this app, or view them in your 
+        <a href="https://supabase.com/dashboard/project/qhyrdlaeeruyireocfbl/auth/users" target="_blank" style="color:var(--primary);font-weight:600">Supabase dashboard → Auth → Users</a>.
+      </p>
+    </div>`;
+}
+
+async function deleteUser(userId, email) {
+  const confirmed = await showModal(
+    'Revoke Access',
+    `Remove "${email}" from the system? They will no longer be able to sign in.`
+  );
+  if (!confirmed) return;
+
+  const { error } = await db.auth.admin.deleteUser(userId);
+  if (error) {
+    showToast('Could not delete via anon key — use Supabase dashboard');
+    return;
+  }
+  showToast('User removed ✓');
+  loadUserList();
+}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
+async function loadDashboard() {
+  // Pull all reservations
+  const { data: all } = await db.from('reservations')
+    .select('*')
+    .order('arrival_date', { ascending: true });
+
+  if (!all) return;
+
+  const active = all.filter(r => r.status !== 'Cancelled');
+
+  // KPI: totals
+  const totalCount   = all.length;
+  const activeCount  = active.length;
+  const totalNights  = active.reduce((s, r) => s + (r.room_night || 0), 0);
+  const totalRevenue = active.reduce((s, r) => s + (r.room_revenue || 0), 0);
+
+  document.getElementById('kpi-total').textContent        = String(totalCount).padStart(2, '0');
+  document.getElementById('kpi-active-badge').textContent = activeCount > 0 ? `+${activeCount} active` : '';
+  document.getElementById('kpi-total-sub').textContent    = `${activeCount} confirmed booking${activeCount !== 1 ? 's' : ''}`;
+  document.getElementById('kpi-nights').textContent       = String(totalNights).padStart(2, '0');
+  document.getElementById('kpi-nights-sub').textContent   = `Across ${[...new Set(active.map(r => r.room_name))].length} room${[...new Set(active.map(r => r.room_name))].length !== 1 ? 's' : ''}`;
+  document.getElementById('kpi-revenue').textContent      = totalRevenue > 0
+    ? totalRevenue.toLocaleString('id-ID')
+    : '0';
+  document.getElementById('kpi-revenue-sub').textContent  = `${activeCount} confirmed booking${activeCount !== 1 ? 's' : ''}`;
+
+  // Upcoming arrivals: future or today, not cancelled, soonest first, max 4
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = active
+    .filter(r => r.arrival_date >= today)
+    .sort((a, b) => a.arrival_date.localeCompare(b.arrival_date))
+    .slice(0, 4);
+
+  // Next arrival label
+  if (upcoming.length > 0) {
+    document.getElementById('dash-next-arrival').textContent = fmtDateLong(upcoming[0].arrival_date);
+  } else {
+    document.getElementById('dash-next-arrival').textContent = 'None scheduled';
+  }
+
+  // Render arrival rows
+  const list = document.getElementById('dash-arrival-list');
+  if (upcoming.length === 0) {
+    list.innerHTML = '<div class="empty-state">No upcoming arrivals. <a href="#" onclick="showPage(\'reservations\', document.querySelector(\'[onclick*=reservations]\'))" style="color:var(--primary);font-weight:600">Create a booking →</a></div>';
+    return;
+  }
+
+  list.innerHTML = upcoming.map(r => {
+    const initials = r.guest_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const rateFormatted = Number(r.rate || 0).toLocaleString('id-ID');
+    return `
+      <div class="arrival-row">
+        <div class="arrival-conf">
+          <div class="lbl">Confirmation</div>
+          <div class="val">${r.confirmation_number || '—'}</div>
+        </div>
+        <div class="arrival-guest">
+          <div class="arrival-avatar">${initials}</div>
+          <div>
+            <div class="arrival-name">${r.guest_name}</div>
+            <div class="arrival-room">${r.room_name || '—'} · ${r.channel || '—'}</div>
+          </div>
+        </div>
+        <div class="arrival-dates">
+          <div class="arrival-date-col">
+            <div class="lbl">Arrival</div>
+            <div class="val">${fmtDateLong(r.arrival_date)}</div>
+          </div>
+          <div class="arrival-divider"></div>
+          <div class="arrival-date-col">
+            <div class="lbl">Departure</div>
+            <div class="val">${fmtDateLong(r.departure_date)}</div>
+          </div>
+        </div>
+        <div class="arrival-rate">
+          <div class="lbl">Rate / Night</div>
+          <div class="val">IDR ${rateFormatted}</div>
+        </div>
+        <div class="arrival-chevron"><span class="mso" style="font-size:16px">chevron_right</span></div>
+      </div>`;
+  }).join('');
+}
+
+function fmtDateLong(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESERVATION SUMMARY
+══════════════════════════════════════════════════════════ */
+async function loadResSummary() {
+  const { data } = await db.from('reservations').select('*').order('created_date', { ascending: false }).limit(4);
+  const list = document.getElementById('res-card-list');
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div class="empty-state">No reservations yet. Create your first booking!</div>';
+  } else {
+    list.innerHTML = data.map(r => {
+      const nights = r.room_night || 0;
+      const chipClass = !r.status || r.status === 'New Reservation' ? 'chip-confirmed' : r.status === 'Cancelled' ? 'chip-cancelled' : 'chip-new';
+      const chipLabel = r.status === 'New Reservation' ? 'Confirmed' : (r.status || 'New');
+      return `
+        <div class="res-card">
+          <div>
+            <div class="res-guest-name">${r.guest_name}</div>
+            <div class="res-guest-meta">${r.country || '—'} · ${r.channel || '—'}</div>
+          </div>
+          <div class="res-dates">
+            <div class="res-dates-range">${fmtDate(r.arrival_date)} — ${fmtDate(r.departure_date)}</div>
+            <div class="res-dates-nights">${nights} Night${nights !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="display:flex;justify-content:center"><span class="res-room">${r.room_name || '—'}</span></div>
+          <div style="display:flex;justify-content:center">
+            <span class="chip ${chipClass}"><span class="chip-dot"></span>${chipLabel}</span>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="icon-btn"><span class="mso">more_vert</span></button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  const { data: all } = await db.from('reservations').select('status, room_night');
+  const total = all?.length || 0;
+  const active = all?.filter(r => r.status !== 'Cancelled').length || 0;
+  const totalNights = all?.reduce((s, r) => s + (r.room_night || 0), 0) || 0;
+  const occ = total > 0 ? Math.min(Math.round((totalNights / (total * 30)) * 100), 99) : 0;
+  document.getElementById('stat-occupancy').textContent = occ + '%';
+  document.getElementById('stat-active').textContent = String(active).padStart(2,'0');
+  document.getElementById('stat-total').textContent = String(total).padStart(2,'0');
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[parseInt(m)-1]} ${parseInt(day)}`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHANNELS
+══════════════════════════════════════════════════════════ */
+async function loadChannels() {
+  const { data } = await db.from('channels').select('*').order('created_at');
+  const list = document.getElementById('channel-list');
+  list.innerHTML = '';
+  if (!data || data.length === 0) { list.innerHTML = '<p style="padding:8px 12px;font-size:13px;color:var(--on-surface-variant)">No channels yet</p>'; return; }
+  data.forEach(ch => { list.innerHTML += `<div class="list-item"><span>${ch.name}</span><button class="remove-btn" onclick="removeChannel('${ch.id}')">✕</button></div>`; });
+}
+async function addChannel() {
+  const input = document.getElementById('new-channel');
+  const name = input.value.trim();
+  if (!name) return showToast('Enter a channel name');
+  const { error } = await db.from('channels').insert({ name });
+  if (error) return showToast('Error adding channel');
+  input.value = ''; loadChannels(); showToast('Channel added ✓');
+}
+async function removeChannel(id) { await db.from('channels').delete().eq('id', id); loadChannels(); showToast('Channel removed'); }
+
+/* ══════════════════════════════════════════════════════════
+   ROOMS
+══════════════════════════════════════════════════════════ */
+async function loadRooms() {
+  const { data } = await db.from('rooms').select('*').order('created_at');
+  const list = document.getElementById('room-list');
+  list.innerHTML = '';
+  if (!data || data.length === 0) { list.innerHTML = '<p style="padding:8px 12px;font-size:13px;color:var(--on-surface-variant)">No rooms yet</p>'; return; }
+  data.forEach(r => { list.innerHTML += `<div class="list-item"><span>${r.name}</span><button class="remove-btn" onclick="removeRoom('${r.id}')">✕</button></div>`; });
+}
+async function addRoom() {
+  const input = document.getElementById('new-room');
+  const name = input.value.trim();
+  if (!name) return showToast('Enter a room name');
+  const { error } = await db.from('rooms').insert({ name });
+  if (error) return showToast('Error adding room');
+  input.value = ''; loadRooms(); showToast('Room added ✓');
+}
+async function removeRoom(id) { await db.from('rooms').delete().eq('id', id); loadRooms(); showToast('Room removed'); }
+
+/* ══════════════════════════════════════════════════════════
+   DROPDOWNS
+══════════════════════════════════════════════════════════ */
+async function loadDropdowns() {
+  const { data: channels } = await db.from('channels').select('*').order('created_at');
+  const { data: rooms }    = await db.from('rooms').select('*').order('created_at');
+  const chSel = document.getElementById('channel-select');
+  chSel.innerHTML = '<option value="">Select channel…</option>';
+  channels?.forEach(c => chSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+  const rmSel = document.getElementById('room-select');
+  rmSel.innerHTML = '<option value="">Select room…</option>';
+  rooms?.forEach(r => rmSel.innerHTML += `<option value="${r.name}">${r.name}</option>`);
+}
+
+/* ══════════════════════════════════════════════════════════
+   AVAILABILITY CHECK
+══════════════════════════════════════════════════════════ */
+async function checkAvailability() {
+  const arrival   = document.getElementById('arrival-date').value;
+  const departure = document.getElementById('departure-date').value;
+  const room      = document.getElementById('room-select').value;
+  const notice    = document.getElementById('avail-notice');
+  if (!arrival || !departure || !room) {
+    notice.className = 'avail-notice';
+    notice.innerHTML = `<span class="mso">info</span><p>Select dates and a room to check availability.</p>`; return;
+  }
+  if (departure <= arrival) {
+    notice.className = 'avail-notice error';
+    notice.innerHTML = `<span class="mso">error</span><p>Departure must be after arrival.</p>`; return;
+  }
+  notice.className = 'avail-notice';
+  notice.innerHTML = `<span class="mso">hourglass_empty</span><p>Checking availability…</p>`;
+  const { data: conflicts } = await db.from('reservations').select('id').eq('room_name', room).neq('status','Cancelled').lt('arrival_date', departure).gt('departure_date', arrival);
+  if (conflicts && conflicts.length > 0) {
+    notice.className = 'avail-notice error';
+    notice.innerHTML = `<span class="mso">block</span><p>Room not available for selected dates. Try different dates or another room.</p>`;
+  } else {
+    notice.className = 'avail-notice success';
+    notice.innerHTML = `<span class="mso">check_circle</span><p>Room is available for the selected dates.</p>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SAVE RESERVATION
+══════════════════════════════════════════════════════════ */
+function generateConfNumber() {
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const letters = Array.from({length:3}, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
+  return date + letters;
+}
+
+async function saveReservation() {
+  const guestName     = document.getElementById('guest-name').value.trim();
+  const arrivalDate   = document.getElementById('arrival-date').value;
+  const departureDate = document.getElementById('departure-date').value;
+  const rate          = parseFloat(document.getElementById('rate').value);
+  const country       = document.getElementById('country').value.trim();
+  const channel       = document.getElementById('channel-select').value;
+  const roomName      = document.getElementById('room-select').value;
+  if (!guestName || !arrivalDate || !departureDate || !rate || !channel || !roomName) return showToast('Please fill in all required fields');
+  if (departureDate <= arrivalDate) return showToast('Departure must be after arrival');
+  const { data: conflicts } = await db.from('reservations').select('id').eq('room_name', roomName).neq('status','Cancelled').lt('arrival_date', departureDate).gt('departure_date', arrivalDate);
+  if (conflicts && conflicts.length > 0) return showToast('Room not available for selected dates');
+  const arrival     = new Date(arrivalDate);
+  const departure   = new Date(departureDate);
+  const roomNight   = Math.round((departure - arrival) / (1000*60*60*24));
+  const roomRevenue = roomNight * rate;
+  const arrivalMonth = arrival.toLocaleString('default', { month:'long', year:'numeric' });
+  let confNumber, exists = true;
+  while (exists) {
+    confNumber = generateConfNumber();
+    const { data } = await db.from('reservations').select('id').eq('confirmation_number', confNumber);
+    exists = data && data.length > 0;
+  }
+  const { error } = await db.from('reservations').insert({
+    confirmation_number: confNumber, guest_name: guestName, arrival_date: arrivalDate,
+    departure_date: departureDate, rate, country, channel, room_name: roomName,
+    arrival_month: arrivalMonth, room_night: roomNight, room_revenue: roomRevenue,
+    status: 'New Reservation'
+  });
+  if (error) return showToast('Error saving reservation');
+  const chip = document.getElementById('save-chip');
+  chip.classList.add('show');
+  setTimeout(() => chip.classList.remove('show'), 3000);
+  showToast(`Saved — ${confNumber}`);
+  clearForm();
+}
+
+function clearForm() {
+  ['guest-name','arrival-date','departure-date','rate','country'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('channel-select').value = '';
+  document.getElementById('room-select').value = '';
+  document.getElementById('notes').value = '';
+  const notice = document.getElementById('avail-notice');
+  notice.className = 'avail-notice';
+  notice.innerHTML = `<span class="mso">info</span><p>Select dates and a room to check availability.</p>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DB TABLE
+══════════════════════════════════════════════════════════ */
+async function loadDbTable() {
+  const { data } = await db.from('reservations').select('*').order('created_date', { ascending: false });
+  const tbody = document.getElementById('reservation-table-body');
+  if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="empty-state">No reservations yet</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.02em">${r.confirmation_number}</td>
+      <td style="color:var(--on-surface-variant)">${r.created_date || '—'}</td>
+      <td><select class="status-select ${r.status === 'Cancelled' ? 'status-cancelled' : 'status-new'}" onchange="updateStatus('${r.id}', this.value, this)">
+        <option ${r.status === 'New Reservation' ? 'selected' : ''}>New Reservation</option>
+        <option ${r.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+      </select></td>
+      <td style="font-weight:500">${r.guest_name}</td>
+      <td>${r.arrival_date}</td><td>${r.departure_date}</td>
+      <td style="font-family:'Manrope',sans-serif;font-weight:600">${Number(r.rate).toLocaleString()}</td>
+      <td style="color:var(--on-surface-variant)">${r.country || '—'}</td>
+      <td>${r.channel}</td><td>${r.room_name}</td>
+      <td style="text-align:center">${r.room_night}</td>
+      <td style="font-family:'Manrope',sans-serif;font-weight:600">${Number(r.room_revenue).toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+async function updateStatus(id, newStatus, selectEl) {
+  await db.from('reservations').update({ status: newStatus }).eq('id', id);
+  selectEl.className = `status-select ${newStatus === 'Cancelled' ? 'status-cancelled' : 'status-new'}`;
+  showToast('Status updated ✓');
+}
 </script>
 </body>
 </html>
